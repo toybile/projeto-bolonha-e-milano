@@ -1,0 +1,47 @@
+@startuml diagrama-sequencia-fim-do-ano
+' Bolonha e Milano - sequencia: o ULTIMO jogador da rodada escolhe "Encerrar turno".
+' Seta cheia = chamada de metodo; seta tracejada = retorno.
+
+title Fim do ano (opcao 7 do ultimo jogador)
+autonumber
+
+actor Jogador as J
+participant ":Menu" as M
+participant ":Partida" as P
+participant ":Cidade" as C
+participant ":Nobreza" as N
+participant "dono:Jogador" as D
+
+J -> M : opcao 7 (Encerrar turno)
+M -> P : passarTurno()
+P --> M : true (fim do ano)
+
+M -> P : encerrarAno(nobreza)
+loop para cada cidade
+  P -> C : avancarAno()
+  P -> N : verificarPromocao(cidade)
+  N -> C : getDono()
+  C --> N : dono
+  N -> N : calcularPrestigio(cidade)
+  alt prestigio suficiente
+    N -> D : promover()
+    D --> N : true
+  end
+  N --> P : true / false
+end
+P --> M : lista de promovidas
+
+M -> M : exibirClassificacao()
+M -> P : terminou()
+P --> M : true / false
+
+alt terminou
+  M -> M : encerrarPartida()
+  M --> J : FIM DE JOGO (vencedor)
+else continua
+  M -> P : getCidadeAtual()
+  P --> M : cidade do primeiro jogador
+  M --> J : "Comeca o ano ... Agora e a vez de ..."
+end
+
+@enduml

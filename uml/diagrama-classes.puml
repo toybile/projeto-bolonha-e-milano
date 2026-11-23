@@ -1,5 +1,5 @@
 @startuml diagrama-classes
-' Bolonha e Milano - diagrama de classes (Etapa 7)
+' Bolonha e Milano - diagrama de classes (Etapa 8, versao final)
 ' Notacao: "-" private, "+" public, {static} = da classe.
 ' Linha cheia com seta = associacao (guarda o objeto como atributo).
 ' Linha tracejada com seta = dependencia (so usa, recebe como parametro).
@@ -29,8 +29,10 @@ class Menu {
   + executar(): void
   - exibirOpcoes(): void
   - processarOpcao(opcao: int): void
+  - lerInteiro(): int
   - lerOpcao(): int
   - lerQuantidade(): int
+  - exigirJogoEmAndamento(): boolean
   - iniciarNovoJogo(): void
   - exibirStatus(): void
   - abrirMercado(): void
@@ -183,6 +185,20 @@ class Nobreza {
   + verificarPromocao(cidade: Cidade): boolean
 }
 
+class Testes {
+  - {static} aprovados: int
+  - {static} reprovados: int
+  + {static} main(args: String[]): void
+  - {static} verificar(descricao: String, condicao: boolean): void
+  - {static} novaCidade(): Cidade
+  - {static} testarCidade(): void
+  - {static} testarMercado(): void
+  - {static} testarAgricultura(): void
+  - {static} testarGoverno(): void
+  - {static} testarConstrucoes(): void
+  - {static} testarJogadorENobreza(): void
+  - {static} testarPartida(): void
+}
 }
 
 ' ----- associacoes (atributos) -----
@@ -206,5 +222,11 @@ Nobreza ..> Cidade
 Nobreza ..> Jogador
 Partida ..> Nobreza
 
+Testes ..> Partida : testa
+Testes ..> Mercado : testa
+Testes ..> Agricultura : testa
+Testes ..> Governo : testa
+Testes ..> Construcoes : testa
+Testes ..> Nobreza : testa
 
 @enduml

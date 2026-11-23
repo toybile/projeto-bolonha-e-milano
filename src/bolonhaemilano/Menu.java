@@ -97,7 +97,8 @@ public class Menu {
     // ================= LEITURA DO TECLADO =================
 
     // Lê uma linha e converte para número. Se não for número, devolve -1.
-    private int lerOpcao() {
+    // (Etapa 8: antes esse try/catch estava copiado em lerOpcao e lerQuantidade.)
+    private int lerInteiro() {
         String linha = scanner.nextLine();
         try {
             return Integer.parseInt(linha.trim());
@@ -106,22 +107,31 @@ public class Menu {
         }
     }
 
-    // Mesma ideia, para quantidades.
+    private int lerOpcao() {
+        return lerInteiro();
+    }
+
     private int lerQuantidade() {
         System.out.print("Quantidade: ");
-        String linha = scanner.nextLine();
-        try {
-            return Integer.parseInt(linha.trim());
-        } catch (NumberFormatException e) {
-            return -1;
+        return lerInteiro();
+    }
+
+    // Se não há jogo, avisa e devolve false. Cada submenu começa com:
+    //     if (!exigirJogoEmAndamento()) { return; }
+    // (Etapa 8: antes esse if estava repetido em 7 métodos.)
+    private boolean exigirJogoEmAndamento() {
+        if (partida == null) {
+            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+            return false;
         }
+        return true;
     }
 
     // ================= 1 - NOVO JOGO =================
 
     private void iniciarNovoJogo() {
         System.out.print("Quantos jogadores (1 a 4)? ");
-        int quantidade = lerOpcao();
+        int quantidade = lerInteiro();
         if (quantidade < 1 || quantidade > Partida.MAXIMO_JOGADORES) {
             quantidade = 2;   // valor inválido vira 2 jogadores
         }
@@ -150,8 +160,7 @@ public class Menu {
     // ================= 2 - STATUS =================
 
     private void exibirStatus() {
-        if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+        if (!exigirJogoEmAndamento()) {
             return;
         }
         cidade.exibirStatus();
@@ -160,8 +169,7 @@ public class Menu {
     // ================= 3 - MERCADO =================
 
     private void abrirMercado() {
-        if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+        if (!exigirJogoEmAndamento()) {
             return;
         }
         boolean noSubmenu = true;
@@ -221,8 +229,7 @@ public class Menu {
     // ================= 4 - AGRICULTURA =================
 
     private void abrirAgricultura() {
-        if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+        if (!exigirJogoEmAndamento()) {
             return;
         }
         boolean noSubmenu = true;
@@ -253,7 +260,7 @@ public class Menu {
 
     private void distribuirAlimentos() {
         System.out.print("Percentual dos graos a distribuir (20 a 80): ");
-        int percentual = lerOpcao();
+        int percentual = lerInteiro();
         int servosAntes = cidade.getServos();
         if (agricultura.distribuirAlimentos(cidade, percentual)) {
             System.out.println("Alimentos distribuidos. Servos: " + servosAntes + " -> " + cidade.getServos());
@@ -265,8 +272,7 @@ public class Menu {
     // ================= 5 - GOVERNO =================
 
     private void abrirGoverno() {
-        if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+        if (!exigirJogoEmAndamento()) {
             return;
         }
         boolean noSubmenu = true;
@@ -300,7 +306,7 @@ public class Menu {
 
     private void definirTaxaImposto() {
         System.out.print("Nova taxa (0 a 50): ");
-        if (governo.definirTaxaImposto(cidade, lerOpcao())) {
+        if (governo.definirTaxaImposto(cidade, lerInteiro())) {
             System.out.println("Taxa definida: " + cidade.getTaxaImposto() + "%");
         } else {
             System.out.println("Taxa recusada: use de 0 a 50.");
@@ -314,7 +320,7 @@ public class Menu {
         System.out.println("3 - Severa (impostos x 1,3)");
         System.out.print("Escolha o nivel: ");
         String nivel;
-        switch (lerOpcao()) {
+        switch (lerInteiro()) {
             case 1: nivel = "Justa"; break;
             case 2: nivel = "Moderada"; break;
             case 3: nivel = "Severa"; break;
@@ -330,8 +336,7 @@ public class Menu {
     // ================= 6 - CONSTRUÇÕES =================
 
     private void abrirConstrucoes() {
-        if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+        if (!exigirJogoEmAndamento()) {
             return;
         }
         boolean noSubmenu = true;
@@ -376,8 +381,7 @@ public class Menu {
      * verifica se o jogo terminou.
      */
     private void encerrarTurno() {
-        if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+        if (!exigirJogoEmAndamento()) {
             return;
         }
         System.out.println("Turno de " + cidade.getDono().getNome() + " encerrado.");
@@ -411,8 +415,7 @@ public class Menu {
     // ================= 8 - CLASSIFICAÇÃO =================
 
     private void exibirClassificacao() {
-        if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+        if (!exigirJogoEmAndamento()) {
             return;
         }
         System.out.println();
