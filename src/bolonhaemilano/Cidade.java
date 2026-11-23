@@ -22,6 +22,8 @@ public class Cidade {
     private static final int SERVOS_INICIAIS = 200;
     private static final int TAXA_IMPOSTO_INICIAL = 10; // %
     private static final String NIVEL_JUSTICA_INICIAL = "Moderada";
+    private static final int SOLDADOS_INICIAIS = 0;
+    private static final int CONSTRUCOES_INICIAIS = 0;
 
     // ---------- ATRIBUTOS ----------
     private String nome;
@@ -36,6 +38,9 @@ public class Cidade {
     private int taxaImposto;       // de 0 a 50 (%)
     private String nivelJustica;   // "Justa", "Moderada" ou "Severa"
 
+    private int soldados;
+    private int construcoes;
+
     public Cidade(String nome, Jogador dono) {
         this.nome = nome;
         this.dono = dono;
@@ -46,6 +51,8 @@ public class Cidade {
         this.servos = SERVOS_INICIAIS;
         this.taxaImposto = TAXA_IMPOSTO_INICIAL;
         this.nivelJustica = NIVEL_JUSTICA_INICIAL;
+        this.soldados = SOLDADOS_INICIAIS;
+        this.construcoes = CONSTRUCOES_INICIAIS;
     }
 
     // ---------- IDENTIFICAÇÃO E ANO ----------
@@ -157,6 +164,42 @@ public class Cidade {
         this.nivelJustica = nivelJustica;
     }
 
+    // ---------- SOLDADOS ----------
+
+    public int getSoldados() {
+        return soldados;
+    }
+
+    public void adicionarSoldados(int quantidade) {
+        soldados = soldados + quantidade;
+    }
+
+    public boolean removerSoldados(int quantidade) {
+        if (quantidade > soldados) {
+            return false;
+        }
+        soldados = soldados - quantidade;
+        return true;
+    }
+
+    // ---------- CONSTRUÇÕES ----------
+
+    public int getConstrucoes() {
+        return construcoes;
+    }
+
+    public void adicionarConstrucoes(int quantidade) {
+        construcoes = construcoes + quantidade;
+    }
+
+    public boolean removerConstrucoes(int quantidade) {
+        if (quantidade > construcoes) {
+            return false;
+        }
+        construcoes = construcoes - quantidade;
+        return true;
+    }
+
     // ---------- STATUS ----------
 
     public void exibirStatus() {
@@ -171,5 +214,7 @@ public class Cidade {
         System.out.println("Servos: " + servos);
         System.out.println("Taxa de imposto: " + taxaImposto + "%");
         System.out.println("Nivel de justica: " + nivelJustica);
+        System.out.println("Soldados: " + soldados);
+        System.out.println("Construcoes: " + construcoes);
     }
 }

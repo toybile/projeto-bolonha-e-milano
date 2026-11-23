@@ -24,6 +24,7 @@ public class Menu {
     private Mercado mercado;
     private Agricultura agricultura;
     private Governo governo;
+    private Construcoes construcoes;
 
     public Menu() {
         scanner = new Scanner(System.in);
@@ -31,6 +32,7 @@ public class Menu {
         mercado = new Mercado();
         agricultura = new Agricultura();
         governo = new Governo();
+        construcoes = new Construcoes();
     }
 
     // Laço principal: mostra, lê, processa... até o jogador escolher Sair.
@@ -55,7 +57,8 @@ public class Menu {
         System.out.println("3 - Mercado");
         System.out.println("4 - Agricultura");
         System.out.println("5 - Governo");
-        System.out.println("6 - Sobre o jogo");
+        System.out.println("6 - Construcoes");
+        System.out.println("7 - Sobre o jogo");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opcao: ");
     }
@@ -90,7 +93,8 @@ public class Menu {
             case 3: abrirMercado(); break;
             case 4: abrirAgricultura(); break;
             case 5: abrirGoverno(); break;
-            case 6: exibirSobre(); break;
+            case 6: abrirConstrucoes(); break;
+            case 7: exibirSobre(); break;
             case 0: emExecucao = false; break;
             default: System.out.println("Opcao invalida. Tente de novo.");
         }
@@ -278,6 +282,47 @@ public class Menu {
             System.out.println("Nivel de justica: " + cidade.getNivelJustica());
         } else {
             System.out.println("Nivel invalido.");
+        }
+    }
+
+    // ================= CONSTRUÇÕES =================
+
+    private void abrirConstrucoes() {
+        if (cidade == null) {
+            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+            return;
+        }
+        boolean noSubmenu = true;
+        while (noSubmenu) {
+            System.out.println();
+            System.out.println("--- CONSTRUCOES (" + cidade.getFlorins() + " florins, "
+                    + cidade.getServos() + " servos) ---");
+            System.out.println("1 - Recrutar soldados (" + construcoes.getPrecoSoldado() + " florins + 1 servo cada)");
+            System.out.println("2 - Construir (" + construcoes.getPrecoConstrucao() + " florins cada)");
+            System.out.println("0 - Voltar");
+            System.out.print("Escolha uma opcao: ");
+            switch (lerOpcao()) {
+                case 1: recrutarSoldados(); break;
+                case 2: construir(); break;
+                case 0: noSubmenu = false; break;
+                default: System.out.println("Opcao invalida.");
+            }
+        }
+    }
+
+    private void recrutarSoldados() {
+        if (construcoes.recrutarSoldados(cidade, lerQuantidade())) {
+            System.out.println("Soldados: " + cidade.getSoldados() + ". Florins: " + cidade.getFlorins());
+        } else {
+            System.out.println("Recrutamento recusado (quantidade invalida, florins ou servos insuficientes).");
+        }
+    }
+
+    private void construir() {
+        if (construcoes.construir(cidade, lerQuantidade())) {
+            System.out.println("Construcoes: " + cidade.getConstrucoes() + ". Florins: " + cidade.getFlorins());
+        } else {
+            System.out.println("Construcao recusada (quantidade invalida ou florins insuficientes).");
         }
     }
 
