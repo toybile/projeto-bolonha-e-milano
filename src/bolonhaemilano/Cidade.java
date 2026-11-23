@@ -19,6 +19,7 @@ public class Cidade {
     private static final int FLORINS_INICIAIS = 1000;
     private static final int TERRAS_INICIAIS = 10000;   // hectares
     private static final int GRAOS_INICIAIS = 500;
+    private static final int SERVOS_INICIAIS = 200;
 
     // ---------- ATRIBUTOS ----------
     private String nome;
@@ -28,6 +29,7 @@ public class Cidade {
     private int florins;
     private int terras;
     private int graos;
+    private int servos;
 
     public Cidade(String nome, Jogador dono) {
         this.nome = nome;
@@ -36,6 +38,7 @@ public class Cidade {
         this.florins = FLORINS_INICIAIS;
         this.terras = TERRAS_INICIAIS;
         this.graos = GRAOS_INICIAIS;
+        this.servos = SERVOS_INICIAIS;
     }
 
     // ---------- IDENTIFICAÇÃO E ANO ----------
@@ -111,6 +114,24 @@ public class Cidade {
         return true;
     }
 
+    // ---------- SERVOS (população) ----------
+
+    public int getServos() {
+        return servos;
+    }
+
+    public void adicionarServos(int quantidade) {
+        servos = servos + quantidade;
+    }
+
+    public boolean removerServos(int quantidade) {
+        if (quantidade > servos) {
+            return false;
+        }
+        servos = servos - quantidade;
+        return true;
+    }
+
     // ---------- STATUS ----------
 
     public void exibirStatus() {
@@ -122,5 +143,6 @@ public class Cidade {
         System.out.println("Florins: " + florins);
         System.out.println("Terras: " + terras + " hectares");
         System.out.println("Graos em estoque: " + graos);
+        System.out.println("Servos: " + servos);
     }
 }

@@ -22,11 +22,13 @@ public class Menu {
 
     // Classes de serviço: cada uma cuida de um grupo de regras.
     private Mercado mercado;
+    private Agricultura agricultura;
 
     public Menu() {
         scanner = new Scanner(System.in);
         emExecucao = true;
         mercado = new Mercado();
+        agricultura = new Agricultura();
     }
 
     // Laço principal: mostra, lê, processa... até o jogador escolher Sair.
@@ -49,7 +51,8 @@ public class Menu {
         System.out.println("1 - Novo jogo");
         System.out.println("2 - Ver status da cidade");
         System.out.println("3 - Mercado");
-        System.out.println("4 - Sobre o jogo");
+        System.out.println("4 - Agricultura");
+        System.out.println("5 - Sobre o jogo");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opcao: ");
     }
@@ -82,7 +85,8 @@ public class Menu {
             case 1: iniciarNovoJogo(); break;
             case 2: exibirStatus(); break;
             case 3: abrirMercado(); break;
-            case 4: exibirSobre(); break;
+            case 4: abrirAgricultura(); break;
+            case 5: exibirSobre(); break;
             case 0: emExecucao = false; break;
             default: System.out.println("Opcao invalida. Tente de novo.");
         }
@@ -169,6 +173,46 @@ public class Menu {
             System.out.println("Venda feita. Florins: " + cidade.getFlorins());
         } else {
             System.out.println("Venda recusada (quantidade invalida ou terras insuficientes).");
+        }
+    }
+
+    // ================= AGRICULTURA =================
+
+    private void abrirAgricultura() {
+        if (cidade == null) {
+            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+            return;
+        }
+        boolean noSubmenu = true;
+        while (noSubmenu) {
+            System.out.println();
+            System.out.println("--- AGRICULTURA (" + cidade.getNome() + ": " + cidade.getGraos() + " graos) ---");
+            System.out.println("1 - Colher a safra");
+            System.out.println("2 - Distribuir alimentos (20% a 80% dos graos)");
+            System.out.println("0 - Voltar");
+            System.out.print("Escolha uma opcao: ");
+            switch (lerOpcao()) {
+                case 1: colher(); break;
+                case 2: distribuirAlimentos(); break;
+                case 0: noSubmenu = false; break;
+                default: System.out.println("Opcao invalida.");
+            }
+        }
+    }
+
+    private void colher() {
+        int hectares = agricultura.processarColheita(cidade);
+        System.out.println("Colheita feita: " + hectares + " hectares cultivados. Graos: " + cidade.getGraos());
+    }
+
+    private void distribuirAlimentos() {
+        System.out.print("Percentual dos graos a distribuir (20 a 80): ");
+        int percentual = lerOpcao();
+        int servosAntes = cidade.getServos();
+        if (agricultura.distribuirAlimentos(cidade, percentual)) {
+            System.out.println("Alimentos distribuidos. Servos: " + servosAntes + " -> " + cidade.getServos());
+        } else {
+            System.out.println("Percentual recusado: use de 20 a 80.");
         }
     }
 
