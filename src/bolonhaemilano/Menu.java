@@ -16,6 +16,10 @@ public class Menu {
     // Enquanto for true, o menu continua aparecendo. A opção 0 muda para false.
     private boolean emExecucao;
 
+    // O jogo em andamento. Enquanto ninguém escolher "Novo jogo", ficam null.
+    private Jogador jogador;
+    private Cidade cidade;
+
     public Menu() {
         scanner = new Scanner(System.in);
         emExecucao = true;
@@ -39,7 +43,8 @@ public class Menu {
         System.out.println("             BOLONHA E MILANO");
         System.out.println("==========================================");
         System.out.println("1 - Novo jogo");
-        System.out.println("2 - Sobre o jogo");
+        System.out.println("2 - Ver status da cidade");
+        System.out.println("3 - Sobre o jogo");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opcao: ");
     }
@@ -60,9 +65,12 @@ public class Menu {
     private void processarOpcao(int opcao) {
         switch (opcao) {
             case 1:
-                System.out.println("Novo jogo: em construcao (Etapa 2).");
+                iniciarNovoJogo();
                 break;
             case 2:
+                exibirStatus();
+                break;
+            case 3:
                 exibirSobre();
                 break;
             case 0:
@@ -71,6 +79,29 @@ public class Menu {
             default:
                 System.out.println("Opcao invalida. Tente de novo.");
         }
+    }
+
+    // Pergunta os nomes, cria o Jogador e a Cidade e mostra o status inicial.
+    private void iniciarNovoJogo() {
+        System.out.print("Nome do jogador: ");
+        String nomeJogador = scanner.nextLine();
+        System.out.print("Nome da cidade: ");
+        String nomeCidade = scanner.nextLine();
+
+        jogador = new Jogador(nomeJogador);
+        cidade = new Cidade(nomeCidade, jogador);   // a cidade recebe o seu dono
+
+        System.out.println("Novo jogo iniciado!");
+        cidade.exibirStatus();
+    }
+
+    // Mostra o status, mas avisa se ainda não existe jogo.
+    private void exibirStatus() {
+        if (cidade == null) {
+            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+            return;
+        }
+        cidade.exibirStatus();
     }
 
     private void exibirSobre() {
