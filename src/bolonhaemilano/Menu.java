@@ -23,12 +23,14 @@ public class Menu {
     // Classes de serviço: cada uma cuida de um grupo de regras.
     private Mercado mercado;
     private Agricultura agricultura;
+    private Governo governo;
 
     public Menu() {
         scanner = new Scanner(System.in);
         emExecucao = true;
         mercado = new Mercado();
         agricultura = new Agricultura();
+        governo = new Governo();
     }
 
     // Laço principal: mostra, lê, processa... até o jogador escolher Sair.
@@ -52,7 +54,8 @@ public class Menu {
         System.out.println("2 - Ver status da cidade");
         System.out.println("3 - Mercado");
         System.out.println("4 - Agricultura");
-        System.out.println("5 - Sobre o jogo");
+        System.out.println("5 - Governo");
+        System.out.println("6 - Sobre o jogo");
         System.out.println("0 - Sair");
         System.out.print("Escolha uma opcao: ");
     }
@@ -86,7 +89,8 @@ public class Menu {
             case 2: exibirStatus(); break;
             case 3: abrirMercado(); break;
             case 4: abrirAgricultura(); break;
-            case 5: exibirSobre(); break;
+            case 5: abrirGoverno(); break;
+            case 6: exibirSobre(); break;
             case 0: emExecucao = false; break;
             default: System.out.println("Opcao invalida. Tente de novo.");
         }
@@ -213,6 +217,67 @@ public class Menu {
             System.out.println("Alimentos distribuidos. Servos: " + servosAntes + " -> " + cidade.getServos());
         } else {
             System.out.println("Percentual recusado: use de 20 a 80.");
+        }
+    }
+
+    // ================= GOVERNO =================
+
+    private void abrirGoverno() {
+        if (cidade == null) {
+            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+            return;
+        }
+        boolean noSubmenu = true;
+        while (noSubmenu) {
+            System.out.println();
+            System.out.println("--- GOVERNO (taxa " + cidade.getTaxaImposto() + "%, justica "
+                    + cidade.getNivelJustica() + ") ---");
+            System.out.println("1 - Arrecadar impostos");
+            System.out.println("2 - Definir taxa de imposto (0 a 50%)");
+            System.out.println("3 - Definir nivel de justica");
+            System.out.println("0 - Voltar");
+            System.out.print("Escolha uma opcao: ");
+            switch (lerOpcao()) {
+                case 1: arrecadarImpostos(); break;
+                case 2: definirTaxaImposto(); break;
+                case 3: definirJustica(); break;
+                case 0: noSubmenu = false; break;
+                default: System.out.println("Opcao invalida.");
+            }
+        }
+    }
+
+    private void arrecadarImpostos() {
+        int arrecadado = governo.arrecadarImpostos(cidade);
+        System.out.println("Impostos arrecadados: " + arrecadado + " florins. Florins: " + cidade.getFlorins());
+    }
+
+    private void definirTaxaImposto() {
+        System.out.print("Nova taxa (0 a 50): ");
+        if (governo.definirTaxaImposto(cidade, lerOpcao())) {
+            System.out.println("Taxa definida: " + cidade.getTaxaImposto() + "%");
+        } else {
+            System.out.println("Taxa recusada: use de 0 a 50.");
+        }
+    }
+
+    // A justiça é escolhida por número, para ninguém errar a digitação do nome.
+    private void definirJustica() {
+        System.out.println("1 - Justa (impostos x 0,8)");
+        System.out.println("2 - Moderada (impostos x 1,0)");
+        System.out.println("3 - Severa (impostos x 1,3)");
+        System.out.print("Escolha o nivel: ");
+        String nivel;
+        switch (lerOpcao()) {
+            case 1: nivel = "Justa"; break;
+            case 2: nivel = "Moderada"; break;
+            case 3: nivel = "Severa"; break;
+            default: nivel = "";      // o Governo vai recusar
+        }
+        if (governo.definirJustica(cidade, nivel)) {
+            System.out.println("Nivel de justica: " + cidade.getNivelJustica());
+        } else {
+            System.out.println("Nivel invalido.");
         }
     }
 
