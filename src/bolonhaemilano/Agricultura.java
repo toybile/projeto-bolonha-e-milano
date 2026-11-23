@@ -14,8 +14,8 @@ public class Agricultura {
     private static final int PERCENTUAL_MAXIMO = 80;
 
     /*
-     * COLHEITA.
-     * Devolve quantos hectares foram cultivados.
+     * COLHEITA (uma vez por ano).
+     * Devolve quantos hectares foram cultivados, ou -1 se já colheu neste ano.
      *
      * Exemplo com a cidade inicial (10000 ha, 200 servos, 500 grãos):
      *   hectares = menor(10000, 200 x 5) = 1000
@@ -23,6 +23,9 @@ public class Agricultura {
      *   produção = 1000 x 2 = 2000  -> grãos: 0 + 2000 = 2000
      */
     public int processarColheita(Cidade cidade) {
+        if (cidade.isColheitaFeita()) {
+            return -1;
+        }
 
         // Só dá para cultivar a terra que existe E que os servos conseguem trabalhar.
         int hectares = Math.min(cidade.getTerras(), cidade.getServos() * HECTARES_POR_SERVO);
@@ -40,6 +43,7 @@ public class Agricultura {
         int producao = hectares * RENDIMENTO_POR_HECTARE;
         cidade.adicionarGraos(producao);
 
+        cidade.marcarColheitaFeita();
         return hectares;
     }
 

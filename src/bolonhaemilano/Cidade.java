@@ -3,9 +3,13 @@ package bolonhaemilano;
 /*
  * CIDADE: a cidade-Estado governada por um jogador.
  *
- * Guarda os dados da cidade. A Cidade não tem regras de jogo: ela só
- * guarda e altera os números. As regras ficam nas classes de serviço,
- * que recebem a cidade como parâmetro.
+ * Guarda TUDO o que a cidade tem: ano, recursos (florins, terras, grãos,
+ * servos), governo (taxa e justiça), defesa (soldados e construções) e o
+ * que já foi feito no ano (colheita e impostos).
+ *
+ * A Cidade não tem regras de jogo: ela só guarda e altera os números.
+ * As regras ficam nas classes de serviço (Mercado, Agricultura, Governo,
+ * Construcoes e Nobreza), que recebem a cidade como parâmetro.
  *
  * Padrão seguro de recursos:
  *   adicionarX(qtd)  -> soma
@@ -41,6 +45,10 @@ public class Cidade {
     private int soldados;
     private int construcoes;
 
+    // "Já fez neste ano?" — impedem colher ou arrecadar duas vezes no mesmo ano.
+    private boolean colheitaFeita;
+    private boolean impostosArrecadados;
+
     public Cidade(String nome, Jogador dono) {
         this.nome = nome;
         this.dono = dono;
@@ -53,6 +61,8 @@ public class Cidade {
         this.nivelJustica = NIVEL_JUSTICA_INICIAL;
         this.soldados = SOLDADOS_INICIAIS;
         this.construcoes = CONSTRUCOES_INICIAIS;
+        this.colheitaFeita = false;
+        this.impostosArrecadados = false;
     }
 
     // ---------- IDENTIFICAÇÃO E ANO ----------
@@ -69,9 +79,30 @@ public class Cidade {
         return dono;
     }
 
-    // Passa para o ano seguinte (será usado a partir da Etapa 7).
+    // Passa para o próximo ano e libera de novo a colheita e os impostos.
+    // Quem chama é a Partida, quando o último jogador encerra o turno.
     public void avancarAno() {
         anoAtual = anoAtual + 1;
+        colheitaFeita = false;
+        impostosArrecadados = false;
+    }
+
+    // ---------- O QUE JÁ FOI FEITO NO ANO ----------
+
+    public boolean isColheitaFeita() {
+        return colheitaFeita;
+    }
+
+    public void marcarColheitaFeita() {
+        colheitaFeita = true;
+    }
+
+    public boolean isImpostosArrecadados() {
+        return impostosArrecadados;
+    }
+
+    public void marcarImpostosArrecadados() {
+        impostosArrecadados = true;
     }
 
     // ---------- FLORINS (dinheiro) ----------
@@ -216,5 +247,8 @@ public class Cidade {
         System.out.println("Nivel de justica: " + nivelJustica);
         System.out.println("Soldados: " + soldados);
         System.out.println("Construcoes: " + construcoes);
+        // Operador ternário: (condição) ? valorSeVerdadeiro : valorSeFalso
+        System.out.println("Colheita deste ano: " + (colheitaFeita ? "feita" : "pendente"));
+        System.out.println("Impostos deste ano: " + (impostosArrecadados ? "arrecadados" : "pendentes"));
     }
 }

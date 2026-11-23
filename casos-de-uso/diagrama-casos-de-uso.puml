@@ -1,0 +1,71 @@
+@startuml diagrama-casos-de-uso
+' Bolonha e Milano - casos de uso (versao final, Etapas 1 a 8)
+
+title Bolonha e Milano - Diagrama de Casos de Uso
+left to right direction
+
+actor Jogador
+
+rectangle "Bolonha e Milano" {
+  usecase "Iniciar novo jogo" as UC1
+  usecase "Ver status da cidade" as UC2
+  usecase "Acessar mercado" as UC3
+  usecase "Acessar agricultura" as UC4
+  usecase "Acessar governo" as UC5
+  usecase "Acessar construcoes" as UC6
+  usecase "Encerrar turno" as UC7
+  usecase "Ver classificacao" as UC8
+  usecase "Ver informacoes sobre o jogo" as UC9
+  usecase "Sair do jogo" as UC10
+
+  usecase "Comprar graos" as M1
+  usecase "Vender graos" as M2
+  usecase "Comprar terras" as M3
+  usecase "Vender terras" as M4
+
+  usecase "Colher (processar safra)" as A1
+  usecase "Distribuir alimentos" as A2
+
+  usecase "Arrecadar impostos" as G1
+  usecase "Definir taxa de imposto" as G2
+  usecase "Definir nivel de justica" as G3
+
+  usecase "Recrutar soldados" as C1
+  usecase "Construir" as C2
+
+  usecase "Fechar o ano\n(promover titulos)" as T1
+  usecase "Declarar vencedor" as T2
+}
+
+Jogador --> UC1
+Jogador --> UC2
+Jogador --> UC3
+Jogador --> UC4
+Jogador --> UC5
+Jogador --> UC6
+Jogador --> UC7
+Jogador --> UC8
+Jogador --> UC9
+Jogador --> UC10
+
+UC1 ..> UC2 : <<include>>
+
+M1 ..> UC3 : <<extend>>
+M2 ..> UC3 : <<extend>>
+M3 ..> UC3 : <<extend>>
+M4 ..> UC3 : <<extend>>
+
+A1 ..> UC4 : <<extend>>
+A2 ..> UC4 : <<extend>>
+
+G1 ..> UC5 : <<extend>>
+G2 ..> UC5 : <<extend>>
+G3 ..> UC5 : <<extend>>
+
+C1 ..> UC6 : <<extend>>
+C2 ..> UC6 : <<extend>>
+
+T1 ..> UC7 : <<extend>>\n(so o ultimo jogador)
+T2 ..> T1 : <<extend>>\n(Rei/Rainha ou fim de 1410)
+
+@enduml
