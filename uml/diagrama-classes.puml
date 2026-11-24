@@ -1,20 +1,115 @@
 @startuml diagrama-classes
-' Bolonha e Milano - diagrama de classes (Etapa 8, versao final)
-' Notacao: "-" private, "+" public, {static} = da classe.
+' Bolonha e Milano - diagrama de classes (versao final)
+' Notacao: "-" private, "+" public, sublinhado = static (da classe).
 ' Linha cheia com seta = associacao (guarda o objeto como atributo).
 ' Linha tracejada com seta = dependencia (so usa, recebe como parametro).
 
-title Bolonha e Milano - Diagrama de Classes
+!theme plain
+skinparam dpi 120
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam roundCorner 10
 skinparam classAttributeIconSize 0
+skinparam nodesep 25
+skinparam ranksep 110
+skinparam ArrowColor #555555
+skinparam ArrowThickness 1.2
+skinparam TitleFontSize 20
+skinparam TitleFontStyle bold
+skinparam class {
+  BorderThickness 1.2
+  FontStyle bold
+}
+skinparam class<<Inicio>> {
+  BackgroundColor #EEF2F7
+  HeaderBackgroundColor #6B7A90
+  BorderColor #6B7A90
+  FontColor #FFFFFF
+}
+skinparam class<<Dados>> {
+  BackgroundColor #FFF8E7
+  HeaderBackgroundColor #B7791F
+  BorderColor #B7791F
+  FontColor #FFFFFF
+}
+skinparam class<<Regras>> {
+  BackgroundColor #EAF6EF
+  HeaderBackgroundColor #2F7A4F
+  BorderColor #2F7A4F
+  FontColor #FFFFFF
+}
+skinparam class<<Controle>> {
+  BackgroundColor #EEF0FB
+  HeaderBackgroundColor #4C51A8
+  BorderColor #4C51A8
+  FontColor #FFFFFF
+}
+skinparam class<<Apoio>> {
+  BackgroundColor #F4F4F4
+  HeaderBackgroundColor #8A8F98
+  BorderColor #8A8F98
+  FontColor #FFFFFF
+}
+skinparam package {
+  BorderColor #9AA5B1
+  FontColor #3C4A5E
+  FontSize 13
+}
+hide circle
+hide stereotype
 hide empty members
+
+title Bolonha e Milano - Diagrama de Classes
+left to right direction
+
+legend top right
+  <b>Cores</b>
+  <back:#6B7A90><color:white> Interface com o jogador </color></back>
+  <back:#4C51A8><color:white> Controle da partida </color></back>
+  <back:#2F7A4F><color:white> Regras do jogo </color></back>
+  <back:#B7791F><color:white> Dados </color></back>
+  <back:#8A8F98><color:white> Apoio (testes e cores) </color></back>
+  linha cheia = associação (atributo)
+  linha tracejada = dependência (parâmetro)
+endlegend
 
 package bolonhaemilano {
 
-class Main {
+class Cores <<Apoio>> {
+  - {static} RESET: String
+  - {static} VERDE: String
+  - {static} VERMELHO: String
+  - {static} AMARELO: String
+  - {static} CIANO: String
+  --
+  + {static} sucesso(texto: String): String
+  + {static} erro(texto: String): String
+  + {static} destaque(texto: String): String
+  + {static} titulo(texto: String): String
+}
+
+class Testes <<Apoio>> {
+  - {static} aprovados: int
+  - {static} reprovados: int
+  --
+  + {static} main(args: String[]): void
+  - {static} verificar(descricao: String, condicao: boolean): void
+  - {static} novaCidade(): Cidade
+  - {static} testarCidade(): void
+  - {static} testarMercado(): void
+  - {static} testarAgricultura(): void
+  - {static} testarGoverno(): void
+  - {static} testarConstrucoes(): void
+  - {static} testarJogadorENobreza(): void
+  - {static} testarPartida(): void
+}
+
+class Main <<Inicio>> {
   + {static} main(args: String[]): void
 }
 
-class Menu {
+class Menu <<Inicio>> {
   - {static} CIDADES_PADRAO: String[]
   - scanner: Scanner
   - emExecucao: boolean
@@ -25,8 +120,12 @@ class Menu {
   - governo: Governo
   - construcoes: Construcoes
   - nobreza: Nobreza
+  --
   + Menu()
   + executar(): void
+  - limparTela(): void
+  - pausar(): void
+  - ehSubmenu(opcao: int): boolean
   - exibirOpcoes(): void
   - processarOpcao(opcao: int): void
   - lerInteiro(): int
@@ -36,11 +135,13 @@ class Menu {
   - iniciarNovoJogo(): void
   - exibirStatus(): void
   - abrirMercado(): void
-  - comprarGraos() / venderGraos() / comprarTerras() / venderTerras(): void
+  - comprarGraos() / venderGraos(): void
+  - comprarTerras() / venderTerras(): void
   - abrirAgricultura(): void
   - colher() / distribuirAlimentos(): void
   - abrirGoverno(): void
-  - arrecadarImpostos() / definirTaxaImposto() / definirJustica(): void
+  - arrecadarImpostos(): void
+  - definirTaxaImposto() / definirJustica(): void
   - abrirConstrucoes(): void
   - recrutarSoldados() / construir(): void
   - encerrarTurno(): void
@@ -50,11 +151,12 @@ class Menu {
   - descreverDaVez(): String
 }
 
-class Partida {
+class Partida <<Controle>> {
   + {static} MAXIMO_JOGADORES: int = 4
   - {static} ANO_FINAL: int = 1410
   - cidades: List<Cidade>
   - indiceAtual: int
+  --
   + adicionarCidade(cidade: Cidade): boolean
   + getCidades(): List<Cidade>
   + getCidadeAtual(): Cidade
@@ -66,7 +168,64 @@ class Partida {
   + determinarVencedor(nobreza: Nobreza): Cidade
 }
 
-class Cidade {
+class Mercado <<Regras>> {
+  - {static} PRECO_GRAO: int = 2
+  - {static} PRECO_TERRA: int = 1
+  --
+  + comprarGraos(cidade: Cidade, quantidade: int): boolean
+  + venderGraos(cidade: Cidade, quantidade: int): boolean
+  + comprarTerras(cidade: Cidade, quantidade: int): boolean
+  + venderTerras(cidade: Cidade, quantidade: int): boolean
+}
+
+class Agricultura <<Regras>> {
+  - {static} HECTARES_POR_SERVO: int = 5
+  - {static} RENDIMENTO_POR_HECTARE: int = 2
+  - {static} SERVOS_POR_GRAO: int = 5
+  - {static} CRESCIMENTO_PERCENTUAL: int = 5
+  - {static} PERCENTUAL_MINIMO: int = 20
+  - {static} PERCENTUAL_MAXIMO: int = 80
+  --
+  + processarColheita(cidade: Cidade): int
+  + distribuirAlimentos(cidade: Cidade, percentual: int): boolean
+}
+
+class Governo <<Regras>> {
+  - {static} TAXA_MAXIMA: int = 50
+  - {static} MULTIPLICADOR_JUSTA: double = 0.8
+  - {static} MULTIPLICADOR_MODERADA: double = 1.0
+  - {static} MULTIPLICADOR_SEVERA: double = 1.3
+  --
+  + arrecadarImpostos(cidade: Cidade): int
+  + definirTaxaImposto(cidade: Cidade, taxa: int): boolean
+  + definirJustica(cidade: Cidade, nivel: String): boolean
+  - multiplicadorPara(nivel: String): double
+}
+
+class Construcoes <<Regras>> {
+  - {static} PRECO_SOLDADO: int = 5
+  - {static} SERVOS_POR_SOLDADO: int = 1
+  - {static} PRECO_CONSTRUCAO: int = 20
+  --
+  + recrutarSoldados(cidade: Cidade, quantidade: int): boolean
+  + construir(cidade: Cidade, quantidade: int): boolean
+  + getPrecoSoldado(): int
+  + getPrecoConstrucao(): int
+}
+
+class Nobreza <<Regras>> {
+  - {static} PESO_CONSTRUCAO: int = 10
+  - {static} PESO_SOLDADO: int = 2
+  - {static} PESO_SERVO: int = 1
+  - {static} HECTARES_POR_PONTO: int = 100
+  - {static} PRESTIGIO_MINIMO: int[] = {0, 400, 550, 700, 850, 1000}
+  --
+  + calcularPrestigio(cidade: Cidade): int
+  + prestigioParaProximoTitulo(jogador: Jogador): int
+  + verificarPromocao(cidade: Cidade): boolean
+}
+
+class Cidade <<Dados>> {
   - {static} ANO_INICIAL: int = 1400
   - {static} FLORINS_INICIAIS: int = 1000
   - {static} TERRAS_INICIAIS: int = 10000
@@ -89,6 +248,7 @@ class Cidade {
   - construcoes: int
   - colheitaFeita: boolean
   - impostosArrecadados: boolean
+  --
   + Cidade(nome: String, dono: Jogador)
   + getNome(): String
   + getAnoAtual(): int
@@ -98,33 +258,28 @@ class Cidade {
   + marcarColheitaFeita(): void
   + isImpostosArrecadados(): boolean
   + marcarImpostosArrecadados(): void
-  + getTaxaImposto(): int / setTaxaImposto(taxa: int): void
-  + getNivelJustica(): String / setNivelJustica(nivel: String): void
+  + getTaxaImposto(): int
+  + setTaxaImposto(taxa: int): void
+  + getNivelJustica(): String
+  + setNivelJustica(nivel: String): void
+  .. um trio get / adicionar / remover por recurso ..
   + getFlorins(): int
   + adicionarFlorins(quantidade: int): void
   + removerFlorins(quantidade: int): boolean
-  + getTerras(): int
-  + adicionarTerras(quantidade: int): void
-  + removerTerras(quantidade: int): boolean
-  + getGraos(): int
-  + adicionarGraos(quantidade: int): void
-  + removerGraos(quantidade: int): boolean
-  + getServos(): int
-  + adicionarServos(quantidade: int): void
-  + removerServos(quantidade: int): boolean
-  + getSoldados(): int
-  + adicionarSoldados(quantidade: int): void
-  + removerSoldados(quantidade: int): boolean
-  + getConstrucoes(): int
-  + adicionarConstrucoes(quantidade: int): void
-  + removerConstrucoes(quantidade: int): boolean
+  + getTerras() / adicionarTerras() / removerTerras()
+  + getGraos() / adicionarGraos() / removerGraos()
+  + getServos() / adicionarServos() / removerServos()
+  + getSoldados() / adicionarSoldados() / removerSoldados()
+  + getConstrucoes() / adicionarConstrucoes() / removerConstrucoes()
+  --
   + exibirStatus(): void
 }
 
-class Jogador {
+class Jogador <<Dados>> {
   - {static} TITULOS: String[]
   - nome: String
   - nivelTitulo: int
+  --
   + Jogador(nome: String)
   + getNome(): String
   + getTitulo(): String
@@ -132,101 +287,37 @@ class Jogador {
   + promover(): boolean
   + ehMonarca(): boolean
 }
-
-class Mercado {
-  - {static} PRECO_GRAO: int = 2
-  - {static} PRECO_TERRA: int = 1
-  + comprarGraos(cidade: Cidade, quantidade: int): boolean
-  + venderGraos(cidade: Cidade, quantidade: int): boolean
-  + comprarTerras(cidade: Cidade, quantidade: int): boolean
-  + venderTerras(cidade: Cidade, quantidade: int): boolean
 }
 
-class Agricultura {
-  - {static} HECTARES_POR_SERVO: int = 5
-  - {static} RENDIMENTO_POR_HECTARE: int = 2
-  - {static} SERVOS_POR_GRAO: int = 5
-  - {static} CRESCIMENTO_PERCENTUAL: int = 5
-  - {static} PERCENTUAL_MINIMO: int = 20
-  - {static} PERCENTUAL_MAXIMO: int = 80
-  + processarColheita(cidade: Cidade): int
-  + distribuirAlimentos(cidade: Cidade, percentual: int): boolean
-}
-
-class Governo {
-  - {static} TAXA_MAXIMA: int = 50
-  - {static} MULTIPLICADOR_JUSTA: double = 0.8
-  - {static} MULTIPLICADOR_MODERADA: double = 1.0
-  - {static} MULTIPLICADOR_SEVERA: double = 1.3
-  + arrecadarImpostos(cidade: Cidade): int
-  + definirTaxaImposto(cidade: Cidade, taxa: int): boolean
-  + definirJustica(cidade: Cidade, nivel: String): boolean
-  - multiplicadorPara(nivel: String): double
-}
-
-class Construcoes {
-  - {static} PRECO_SOLDADO: int = 5
-  - {static} SERVOS_POR_SOLDADO: int = 1
-  - {static} PRECO_CONSTRUCAO: int = 20
-  + recrutarSoldados(cidade: Cidade, quantidade: int): boolean
-  + construir(cidade: Cidade, quantidade: int): boolean
-  + getPrecoSoldado(): int
-  + getPrecoConstrucao(): int
-}
-
-class Nobreza {
-  - {static} PESO_CONSTRUCAO: int = 10
-  - {static} PESO_SOLDADO: int = 2
-  - {static} PESO_SERVO: int = 1
-  - {static} HECTARES_POR_PONTO: int = 100
-  - {static} PRESTIGIO_MINIMO: int[] = {0, 400, 550, 700, 850, 1000}
-  + calcularPrestigio(cidade: Cidade): int
-  + prestigioParaProximoTitulo(jogador: Jogador): int
-  + verificarPromocao(cidade: Cidade): boolean
-}
-
-class Testes {
-  - {static} aprovados: int
-  - {static} reprovados: int
-  + {static} main(args: String[]): void
-  - {static} verificar(descricao: String, condicao: boolean): void
-  - {static} novaCidade(): Cidade
-  - {static} testarCidade(): void
-  - {static} testarMercado(): void
-  - {static} testarAgricultura(): void
-  - {static} testarGoverno(): void
-  - {static} testarConstrucoes(): void
-  - {static} testarJogadorENobreza(): void
-  - {static} testarPartida(): void
-}
-}
-
-' ----- associacoes (atributos) -----
+' ----- disposicao: Main/Menu no topo, regras no meio, dados embaixo -----
 Main ..> Menu : cria
+Menu ..> Cores : pinta as mensagens
+
 Menu --> "0..1" Partida : partida
-Menu --> "0..1" Cidade : cidade (vez atual)
 Menu --> "1" Mercado
 Menu --> "1" Agricultura
 Menu --> "1" Governo
 Menu --> "1" Construcoes
 Menu --> "1" Nobreza
+Menu --> "0..1" Cidade : vez atual
+
 Partida --> "1..4" Cidade : cidades
+Partida ..> Nobreza
 Cidade --> "1" Jogador : dono
 
-' ----- dependencias (parametros) -----
 Mercado ..> Cidade
 Agricultura ..> Cidade
 Governo ..> Cidade
 Construcoes ..> Cidade
 Nobreza ..> Cidade
 Nobreza ..> Jogador
-Partida ..> Nobreza
 
-Testes ..> Partida : testa
-Testes ..> Mercado : testa
-Testes ..> Agricultura : testa
-Testes ..> Governo : testa
-Testes ..> Construcoes : testa
-Testes ..> Nobreza : testa
+' Testes: segundo main, depende das classes de regra; o jogo nao conhece Testes.
+Testes .[#B0B4BA].> Partida
+Testes .[#B0B4BA].> Mercado
+Testes .[#B0B4BA].> Agricultura
+Testes .[#B0B4BA].> Governo
+Testes .[#B0B4BA].> Construcoes
+Testes .[#B0B4BA].> Nobreza
 
 @enduml

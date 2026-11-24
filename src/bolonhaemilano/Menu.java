@@ -14,6 +14,10 @@ import java.util.Scanner;
  *   1 Novo jogo        2 Ver status       3 Mercado        4 Agricultura
  *   5 Governo          6 Construcoes      7 Encerrar turno 8 Classificacao
  *   9 Sobre o jogo     0 Sair
+ *
+ * Melhorias extras: a tela é limpa a cada volta do menu (limparTela), o
+ * resultado fica na tela até o ENTER (pausar) e as mensagens são coloridas
+ * pela classe Cores (verde = deu certo, vermelho = recusado).
  */
 public class Menu {
 
@@ -47,9 +51,15 @@ public class Menu {
 
     public void executar() {
         while (emExecucao) {
+            limparTela();
             exibirOpcoes();
             int opcao = lerOpcao();
             processarOpcao(opcao);
+            // Os submenus (3 a 6) já pausam sozinhos; o resto pausa aqui,
+            // para a mensagem não sumir quando a tela for limpa.
+            if (emExecucao && !ehSubmenu(opcao)) {
+                pausar();
+            }
         }
         scanner.close();
         System.out.println("Ate a proxima!");
@@ -57,14 +67,14 @@ public class Menu {
 
     private void exibirOpcoes() {
         System.out.println();
-        System.out.println("==========================================");
-        System.out.println("             BOLONHA E MILANO");
+        System.out.println(Cores.titulo("=========================================="));
+        System.out.println(Cores.titulo("             BOLONHA E MILANO"));
         // No topo aparece sempre o ano e de quem é a vez.
         if (partida != null) {
-            System.out.println("   Ano " + partida.getAnoAtual() + " | Vez de "
-                    + cidade.getDono().getNome() + " (" + cidade.getNome() + ")");
+            System.out.println(Cores.destaque("   Ano " + partida.getAnoAtual() + " | Vez de "
+                    + cidade.getDono().getNome() + " (" + cidade.getNome() + ")"));
         }
-        System.out.println("==========================================");
+        System.out.println(Cores.titulo("=========================================="));
         System.out.println("1 - Novo jogo");
         System.out.println("2 - Ver status da cidade");
         System.out.println("3 - Mercado");
@@ -90,8 +100,27 @@ public class Menu {
             case 8: exibirClassificacao(); break;
             case 9: exibirSobre(); break;
             case 0: emExecucao = false; break;
-            default: System.out.println("Opcao invalida. Tente de novo.");
+            default: System.out.println(Cores.erro("Opcao invalida. Tente de novo."));
         }
+    }
+
+    // ================= TELA (melhoria extra) =================
+
+    // Limpa o terminal: \033[H põe o cursor no topo e \033[2J apaga a tela.
+    private void limparTela() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    // Segura o resultado na tela até o jogador apertar ENTER.
+    private void pausar() {
+        System.out.print("\nPressione ENTER para continuar...");
+        scanner.nextLine();
+    }
+
+    // Opções 3 a 6 abrem um submenu, que pausa sozinho (se há jogo em andamento).
+    private boolean ehSubmenu(int opcao) {
+        return partida != null && opcao >= 3 && opcao <= 6;
     }
 
     // ================= LEITURA DO TECLADO =================
@@ -121,7 +150,7 @@ public class Menu {
     // (Etapa 8: antes esse if estava repetido em 7 métodos.)
     private boolean exigirJogoEmAndamento() {
         if (partida == null) {
-            System.out.println("Nenhum jogo em andamento. Escolha 1 para comecar.");
+            System.out.println(Cores.erro("Nenhum jogo em andamento. Escolha 1 para comecar."));
             return false;
         }
         return true;
@@ -152,9 +181,9 @@ public class Menu {
 
         cidade = partida.getCidadeAtual();
         System.out.println();
-        System.out.println("Novo jogo iniciado! Ano " + partida.getAnoAtual() + ". A partida vai ate");
+        System.out.println(Cores.sucesso("Novo jogo iniciado! Ano " + partida.getAnoAtual() + ". A partida vai ate"));
         System.out.println("o fim de " + partida.getAnoFinal() + " ou ate alguem virar Rei/Rainha.");
-        System.out.println("Comeca: " + descreverDaVez() + ".");
+        System.out.println(Cores.destaque("Comeca: " + descreverDaVez() + "."));
     }
 
     // ================= 2 - STATUS =================
@@ -174,8 +203,8 @@ public class Menu {
         }
         boolean noSubmenu = true;
         while (noSubmenu) {
-            System.out.println();
-            System.out.println("--- MERCADO (" + cidade.getNome() + ": " + cidade.getFlorins() + " florins) ---");
+            limparTela();
+            System.out.println(Cores.titulo("--- MERCADO (" + cidade.getNome() + ": " + cidade.getFlorins() + " florins) ---"));
             System.out.println("1 - Comprar graos (2 florins cada)");
             System.out.println("2 - Vender graos (2 florins cada)");
             System.out.println("3 - Comprar terras (1 florim por hectare)");
@@ -188,7 +217,10 @@ public class Menu {
                 case 3: comprarTerras(); break;
                 case 4: venderTerras(); break;
                 case 0: noSubmenu = false; break;
-                default: System.out.println("Opcao invalida.");
+                default: System.out.println(Cores.erro("Opcao invalida."));
+            }
+            if (noSubmenu) {
+                pausar();
             }
         }
     }
@@ -196,33 +228,33 @@ public class Menu {
     // Cada operação só lê a quantidade e chama o Mercado (quem decide é ele).
     private void comprarGraos() {
         if (mercado.comprarGraos(cidade, lerQuantidade())) {
-            System.out.println("Compra feita. Graos: " + cidade.getGraos());
+            System.out.println(Cores.sucesso("Compra feita. Graos: " + cidade.getGraos()));
         } else {
-            System.out.println("Compra recusada (quantidade invalida ou florins insuficientes).");
+            System.out.println(Cores.erro("Compra recusada (quantidade invalida ou florins insuficientes)."));
         }
     }
 
     private void venderGraos() {
         if (mercado.venderGraos(cidade, lerQuantidade())) {
-            System.out.println("Venda feita. Florins: " + cidade.getFlorins());
+            System.out.println(Cores.sucesso("Venda feita. Florins: " + cidade.getFlorins()));
         } else {
-            System.out.println("Venda recusada (quantidade invalida ou graos insuficientes).");
+            System.out.println(Cores.erro("Venda recusada (quantidade invalida ou graos insuficientes)."));
         }
     }
 
     private void comprarTerras() {
         if (mercado.comprarTerras(cidade, lerQuantidade())) {
-            System.out.println("Compra feita. Terras: " + cidade.getTerras() + " hectares");
+            System.out.println(Cores.sucesso("Compra feita. Terras: " + cidade.getTerras() + " hectares"));
         } else {
-            System.out.println("Compra recusada (quantidade invalida ou florins insuficientes).");
+            System.out.println(Cores.erro("Compra recusada (quantidade invalida ou florins insuficientes)."));
         }
     }
 
     private void venderTerras() {
         if (mercado.venderTerras(cidade, lerQuantidade())) {
-            System.out.println("Venda feita. Florins: " + cidade.getFlorins());
+            System.out.println(Cores.sucesso("Venda feita. Florins: " + cidade.getFlorins()));
         } else {
-            System.out.println("Venda recusada (quantidade invalida ou terras insuficientes).");
+            System.out.println(Cores.erro("Venda recusada (quantidade invalida ou terras insuficientes)."));
         }
     }
 
@@ -234,8 +266,8 @@ public class Menu {
         }
         boolean noSubmenu = true;
         while (noSubmenu) {
-            System.out.println();
-            System.out.println("--- AGRICULTURA (" + cidade.getNome() + ": " + cidade.getGraos() + " graos) ---");
+            limparTela();
+            System.out.println(Cores.titulo("--- AGRICULTURA (" + cidade.getNome() + ": " + cidade.getGraos() + " graos) ---"));
             System.out.println("1 - Colher a safra (1 vez por ano)");
             System.out.println("2 - Distribuir alimentos (20% a 80% dos graos)");
             System.out.println("0 - Voltar");
@@ -244,7 +276,10 @@ public class Menu {
                 case 1: colher(); break;
                 case 2: distribuirAlimentos(); break;
                 case 0: noSubmenu = false; break;
-                default: System.out.println("Opcao invalida.");
+                default: System.out.println(Cores.erro("Opcao invalida."));
+            }
+            if (noSubmenu) {
+                pausar();
             }
         }
     }
@@ -252,9 +287,9 @@ public class Menu {
     private void colher() {
         int hectares = agricultura.processarColheita(cidade);
         if (hectares == -1) {
-            System.out.println("A colheita deste ano ja foi feita.");
+            System.out.println(Cores.erro("A colheita deste ano ja foi feita."));
         } else {
-            System.out.println("Colheita feita: " + hectares + " hectares cultivados. Graos: " + cidade.getGraos());
+            System.out.println(Cores.sucesso("Colheita feita: " + hectares + " hectares cultivados. Graos: " + cidade.getGraos()));
         }
     }
 
@@ -263,9 +298,9 @@ public class Menu {
         int percentual = lerInteiro();
         int servosAntes = cidade.getServos();
         if (agricultura.distribuirAlimentos(cidade, percentual)) {
-            System.out.println("Alimentos distribuidos. Servos: " + servosAntes + " -> " + cidade.getServos());
+            System.out.println(Cores.sucesso("Alimentos distribuidos. Servos: " + servosAntes + " -> " + cidade.getServos()));
         } else {
-            System.out.println("Percentual recusado: use de 20 a 80.");
+            System.out.println(Cores.erro("Percentual recusado: use de 20 a 80."));
         }
     }
 
@@ -277,9 +312,9 @@ public class Menu {
         }
         boolean noSubmenu = true;
         while (noSubmenu) {
-            System.out.println();
-            System.out.println("--- GOVERNO (taxa " + cidade.getTaxaImposto() + "%, justica "
-                    + cidade.getNivelJustica() + ") ---");
+            limparTela();
+            System.out.println(Cores.titulo("--- GOVERNO (taxa " + cidade.getTaxaImposto() + "%, justica "
+                    + cidade.getNivelJustica() + ") ---"));
             System.out.println("1 - Arrecadar impostos (1 vez por ano)");
             System.out.println("2 - Definir taxa de imposto (0 a 50%)");
             System.out.println("3 - Definir nivel de justica");
@@ -290,7 +325,10 @@ public class Menu {
                 case 2: definirTaxaImposto(); break;
                 case 3: definirJustica(); break;
                 case 0: noSubmenu = false; break;
-                default: System.out.println("Opcao invalida.");
+                default: System.out.println(Cores.erro("Opcao invalida."));
+            }
+            if (noSubmenu) {
+                pausar();
             }
         }
     }
@@ -298,18 +336,18 @@ public class Menu {
     private void arrecadarImpostos() {
         int arrecadado = governo.arrecadarImpostos(cidade);
         if (arrecadado == -1) {
-            System.out.println("Os impostos deste ano ja foram arrecadados.");
+            System.out.println(Cores.erro("Os impostos deste ano ja foram arrecadados."));
         } else {
-            System.out.println("Impostos arrecadados: " + arrecadado + " florins. Florins: " + cidade.getFlorins());
+            System.out.println(Cores.sucesso("Impostos arrecadados: " + arrecadado + " florins. Florins: " + cidade.getFlorins()));
         }
     }
 
     private void definirTaxaImposto() {
         System.out.print("Nova taxa (0 a 50): ");
         if (governo.definirTaxaImposto(cidade, lerInteiro())) {
-            System.out.println("Taxa definida: " + cidade.getTaxaImposto() + "%");
+            System.out.println(Cores.sucesso("Taxa definida: " + cidade.getTaxaImposto() + "%"));
         } else {
-            System.out.println("Taxa recusada: use de 0 a 50.");
+            System.out.println(Cores.erro("Taxa recusada: use de 0 a 50."));
         }
     }
 
@@ -327,9 +365,9 @@ public class Menu {
             default: nivel = "";      // o Governo vai recusar
         }
         if (governo.definirJustica(cidade, nivel)) {
-            System.out.println("Nivel de justica: " + cidade.getNivelJustica());
+            System.out.println(Cores.sucesso("Nivel de justica: " + cidade.getNivelJustica()));
         } else {
-            System.out.println("Nivel invalido.");
+            System.out.println(Cores.erro("Nivel invalido."));
         }
     }
 
@@ -341,9 +379,9 @@ public class Menu {
         }
         boolean noSubmenu = true;
         while (noSubmenu) {
-            System.out.println();
-            System.out.println("--- CONSTRUCOES (" + cidade.getFlorins() + " florins, "
-                    + cidade.getServos() + " servos) ---");
+            limparTela();
+            System.out.println(Cores.titulo("--- CONSTRUCOES (" + cidade.getFlorins() + " florins, "
+                    + cidade.getServos() + " servos) ---"));
             System.out.println("1 - Recrutar soldados (" + construcoes.getPrecoSoldado() + " florins + 1 servo cada)");
             System.out.println("2 - Construir (" + construcoes.getPrecoConstrucao() + " florins cada)");
             System.out.println("0 - Voltar");
@@ -352,24 +390,27 @@ public class Menu {
                 case 1: recrutarSoldados(); break;
                 case 2: construir(); break;
                 case 0: noSubmenu = false; break;
-                default: System.out.println("Opcao invalida.");
+                default: System.out.println(Cores.erro("Opcao invalida."));
+            }
+            if (noSubmenu) {
+                pausar();
             }
         }
     }
 
     private void recrutarSoldados() {
         if (construcoes.recrutarSoldados(cidade, lerQuantidade())) {
-            System.out.println("Soldados: " + cidade.getSoldados() + ". Florins: " + cidade.getFlorins());
+            System.out.println(Cores.sucesso("Soldados: " + cidade.getSoldados() + ". Florins: " + cidade.getFlorins()));
         } else {
-            System.out.println("Recrutamento recusado (quantidade invalida, florins ou servos insuficientes).");
+            System.out.println(Cores.erro("Recrutamento recusado (quantidade invalida, florins ou servos insuficientes)."));
         }
     }
 
     private void construir() {
         if (construcoes.construir(cidade, lerQuantidade())) {
-            System.out.println("Construcoes: " + cidade.getConstrucoes() + ". Florins: " + cidade.getFlorins());
+            System.out.println(Cores.sucesso("Construcoes: " + cidade.getConstrucoes() + ". Florins: " + cidade.getFlorins()));
         } else {
-            System.out.println("Construcao recusada (quantidade invalida ou florins insuficientes).");
+            System.out.println(Cores.erro("Construcao recusada (quantidade invalida ou florins insuficientes)."));
         }
     }
 
@@ -394,10 +435,10 @@ public class Menu {
             List<Cidade> promovidas = partida.encerrarAno(nobreza);
 
             System.out.println();
-            System.out.println("========= FIM DO ANO " + anoQueTerminou + " =========");
+            System.out.println(Cores.destaque("========= FIM DO ANO " + anoQueTerminou + " ========="));
             for (Cidade promovida : promovidas) {
-                System.out.println(promovida.getDono().getNome() + ", de " + promovida.getNome()
-                        + ", agora e " + promovida.getDono().getTitulo() + "!");
+                System.out.println(Cores.destaque(promovida.getDono().getNome() + ", de " + promovida.getNome()
+                        + ", agora e " + promovida.getDono().getTitulo() + "!"));
             }
             exibirClassificacao();
 
@@ -405,11 +446,11 @@ public class Menu {
                 encerrarPartida();
                 return;
             }
-            System.out.println("Comeca o ano " + partida.getAnoAtual() + ".");
+            System.out.println(Cores.destaque("Comeca o ano " + partida.getAnoAtual() + "."));
         }
 
         cidade = partida.getCidadeAtual();
-        System.out.println("Agora e a vez de " + descreverDaVez() + ".");
+        System.out.println(Cores.destaque("Agora e a vez de " + descreverDaVez() + "."));
     }
 
     // ================= 8 - CLASSIFICAÇÃO =================
@@ -419,7 +460,7 @@ public class Menu {
             return;
         }
         System.out.println();
-        System.out.println("----------- CLASSIFICACAO -----------");
+        System.out.println(Cores.titulo("----------- CLASSIFICACAO -----------"));
         for (Cidade c : partida.getCidades()) {
             Jogador dono = c.getDono();
             System.out.println(c.getNome() + " | " + dono.getNome() + " (" + dono.getTitulo()
@@ -438,10 +479,10 @@ public class Menu {
     private void encerrarPartida() {
         Cidade vencedora = partida.determinarVencedor(nobreza);
         System.out.println();
-        System.out.println("============ FIM DE JOGO ============");
-        System.out.println("Vencedor: " + vencedora.getDono().getNome() + " ("
+        System.out.println(Cores.destaque("============ FIM DE JOGO ============"));
+        System.out.println(Cores.destaque("Vencedor: " + vencedora.getDono().getNome() + " ("
                 + vencedora.getDono().getTitulo() + "), de " + vencedora.getNome()
-                + ", com prestigio " + nobreza.calcularPrestigio(vencedora) + ".");
+                + ", com prestigio " + nobreza.calcularPrestigio(vencedora) + "."));
         partida = null;
         cidade = null;
     }

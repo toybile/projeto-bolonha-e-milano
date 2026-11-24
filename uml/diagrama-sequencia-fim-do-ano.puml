@@ -2,46 +2,85 @@
 ' Bolonha e Milano - sequencia: o ULTIMO jogador da rodada escolhe "Encerrar turno".
 ' Seta cheia = chamada de metodo; seta tracejada = retorno.
 
-title Fim do ano (opcao 7 do ultimo jogador)
-autonumber
+!theme plain
+skinparam dpi 150
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam TitleFontSize 20
+skinparam TitleFontStyle bold
+skinparam ArrowColor #3C4A5E
+skinparam ArrowThickness 1.2
+skinparam sequence {
+  LifeLineBorderColor #9AA5B1
+  LifeLineBackgroundColor #EEF0FB
+  ParticipantBorderThickness 1.2
+  ParticipantFontStyle bold
+  ActorBorderColor #3C4A5E
+  ActorBackgroundColor #EEF2F7
+  GroupBorderColor #9AA5B1
+  GroupBackgroundColor #F5F6F8
+  GroupHeaderFontColor #3C4A5E
+  MessageAlign left
+}
+skinparam participant {
+  BorderColor #3C4A5E
+  FontColor #FFFFFF
+}
+
+title Fim do ano (opção 7 do último jogador da rodada)
+autonumber "<b>0."
 
 actor Jogador as J
-participant ":Menu" as M
-participant ":Partida" as P
-participant ":Cidade" as C
-participant ":Nobreza" as N
-participant "dono:Jogador" as D
+participant ":Menu" as M #6B7A90
+participant ":Partida" as P #4C51A8
+participant ":Cidade" as C #B7791F
+participant ":Nobreza" as N #2F7A4F
+participant "dono:Jogador" as D #B7791F
 
-J -> M : opcao 7 (Encerrar turno)
+J -> M : opção 7 (Encerrar turno)
+activate M
 M -> P : passarTurno()
+activate P
 P --> M : true (fim do ano)
+deactivate P
 
 M -> P : encerrarAno(nobreza)
-loop para cada cidade
+activate P
+loop para cada cidade da partida
   P -> C : avancarAno()
   P -> N : verificarPromocao(cidade)
+  activate N
   N -> C : getDono()
   C --> N : dono
   N -> N : calcularPrestigio(cidade)
-  alt prestigio suficiente
+  alt prestígio suficiente
     N -> D : promover()
     D --> N : true
   end
   N --> P : true / false
+  deactivate N
 end
 P --> M : lista de promovidas
+deactivate P
 
 M -> M : exibirClassificacao()
 M -> P : terminou()
+activate P
 P --> M : true / false
+deactivate P
 
 alt terminou
   M -> M : encerrarPartida()
   M --> J : FIM DE JOGO (vencedor)
 else continua
   M -> P : getCidadeAtual()
+  activate P
   P --> M : cidade do primeiro jogador
-  M --> J : "Comeca o ano ... Agora e a vez de ..."
+  deactivate P
+  M --> J : "Começa o ano... Agora é a vez de..."
 end
+deactivate M
 
 @enduml

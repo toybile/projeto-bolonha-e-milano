@@ -33,6 +33,18 @@ java -cp bin bolonhaemilano.Testes
 
 Saída esperada no final: `Aprovados: 37 | Reprovados: 0`.
 
+## Melhorias extras
+
+Além do que as 8 etapas pedem:
+
+- **Tela limpa a cada volta do menu** (`limparTela()` no `Menu`): o ano e a vez do
+  jogador ficam sempre no topo, e `pausar()` segura cada resultado até o ENTER.
+- **Cores no terminal** (classe `Cores`): verde quando a ação deu certo, vermelho
+  quando foi recusada, amarelo para o fim do ano, promoções e vencedor.
+
+As cores e a limpeza usam códigos ANSI, que funcionam no Terminal do Windows
+(Windows Terminal). Em consoles que não entendem ANSI aparecem símbolos no lugar.
+
 ## Menu
 
 | Opção | O que faz |
@@ -66,12 +78,26 @@ src/bolonhaemilano/
   Construcoes.java   soldados e obras
   Nobreza.java       prestígio e promoção de títulos
   Testes.java        testes automáticos (main próprio, sem JUnit)
+  Cores.java         cores das mensagens no terminal (melhoria extra)
 uml/
-  diagrama-classes.puml
-  diagrama-sequencia-fim-do-ano.puml
+  diagrama-classes.puml / .png
+  diagrama-sequencia-fim-do-ano.puml / .png
 casos-de-uso/
-  diagrama-casos-de-uso.puml
+  diagrama-casos-de-uso.puml / .png
 ```
 
-Os diagramas estão em PlantUML. Para ver a imagem, cole o conteúdo do `.puml` em
-[plantuml.com](https://www.plantuml.com/plantuml) ou use a extensão PlantUML do VS Code.
+## Diagramas
+
+Os diagramas foram escritos em PlantUML (arquivos `.puml`); os `.png` são as imagens geradas a partir deles.
+
+### Casos de uso
+
+![Diagrama de casos de uso](casos-de-uso/diagrama-casos-de-uso.png)
+
+### Classes
+
+![Diagrama de classes](uml/diagrama-classes.png)
+
+### Sequência: fim do ano
+
+![Diagrama de sequência do fim do ano](uml/diagrama-sequencia-fim-do-ano.png)
