@@ -162,7 +162,7 @@ public class Menu {
         System.out.print("Quantos jogadores (1 a 4)? ");
         int quantidade = lerInteiro();
         if (quantidade < 1 || quantidade > Partida.MAXIMO_JOGADORES) {
-            System.out.print("Número de jogadores inválido. Padrão: 2 jogadores.");
+            System.out.print("Número de jogadores inválido./nPadrão: 2 jogadores./n");
             quantidade = 2;
         }
 
