@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="parchment-backdrop" aria-hidden="true"></div>
@@ -157,6 +157,7 @@
           </div>
 
           <div class="panorama-wrapper">
+            <div id="panorama-caption" class="panorama-caption"></div>
             <div id="city-panorama-svg" class="city-panorama-svg" aria-label="Panorama ilustrado da cidade-Estado"></div>
           </div>
 
@@ -583,8 +584,11 @@
           <li><strong>Prestígio:</strong> <code>construções × 10 + soldados × 2 + servos + terras ÷ 100</code>. Florins guardados não contam.</li>
           <li><strong>Promoções:</strong> só é possível subir <strong>1 título por ano</strong>, no encerramento do ano (Cavaleiro → Barão 400 → Conde 550 → Marquês 700 → Duque 850 → Rei/Rainha 1000).</li>
           <li><strong>Limites anuais:</strong> cada cidade pode <em>colher a safra</em> e <em>arrecadar impostos</em> apenas 1 vez por ano.</li>
-          <li><strong>Projeto original:</strong> 4º bimestre de SPOTDES (IFSP São Paulo), rodando diretamente sobre as classes Java originais.</li>
+          <li><strong>Projeto original:</strong> 4º bimestre de SPOTDES (IFSP São Paulo), compatível com o servidor Java local e com modo estático no navegador.</li>
         </ul>
+        <p class="about-engine-line">
+          Motor ativo: <span id="engine-mode-badge" class="pill pill-ink">Verificando...</span>
+        </p>
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-primary" id="btn-ok-about">Entendido</button>
@@ -592,6 +596,7 @@
     </div>
   </div>
 
-  <script src="/app.js"></script>
+  <script src="engine-local.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

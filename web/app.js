@@ -19,6 +19,8 @@
   ];
 
   const state = {
+    mode: "java",
+    localEngine: null,
     playerCount: 2,
     game: null,
     activeTab: "mercado",
@@ -118,12 +120,17 @@
   }
 
   async function api(url, method = "GET", body = null) {
+    if (state.mode === "static" && state.localEngine) {
+      return state.localEngine.handleRequest(url, method, body);
+    }
+
+    const relativeUrl = String(url).replace(/^\//, "");
     const options = { method, headers: {} };
     if (body !== null) {
       options.headers["Content-Type"] = "application/json; charset=utf-8";
       options.body = JSON.stringify(body);
     }
-    const response = await fetch(url, options);
+    const response = await fetch(relativeUrl, options);
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.erro || data.mensagem || "Erro ao comunicar com o servidor.");
@@ -599,12 +606,13 @@
         <rect x="125" y="130" width="590" height="14" fill="#b9a07a" stroke="#5c4b3b" stroke-width="1.3"/>
         ${ameiasSvg}
         ${guardasSvg}
-        <!-- Legenda visual -->
-        <text x="18" y="26" font-family="Cinzel, serif" font-size="12" font-weight="700" fill="#5c4b3b">
-          ${escapeHtml(c.nome)} · ${fmt(c.terras)} ha · ${fmt(c.construcoes)} obras · ${fmt(c.soldados)} soldados
-        </text>
       </svg>
     `;
+
+    const captionEl = document.getElementById("panorama-caption");
+    if (captionEl) {
+      captionEl.textContent = `${c.nome} · ${fmt(c.terras)} ha · ${fmt(c.construcoes)} obras · ${fmt(c.soldados)} soldados`;
+    }
   }
 
   function resetActionInputs() {
@@ -847,14 +855,58 @@
 
   // ================= INICIALIZAÇÃO =================
 
+  function atualizarBadgeMotor() {
+    const badge = document.getElementById("engine-mode-badge");
+    if (!badge) return;
+    badge.textContent = state.mode === "static" ? "Modo Navegador (estático)" : "Motor Java (local)";
+  }
+
+  function deveForcarModoEstatico() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "static") return true;
+    if (window.location.protocol === "file:") return true;
+    if (window.location.hostname.endsWith("github.io")) return true;
+    return false;
+  }
+
+  function ativarModoEstatico() {
+    state.mode = "static";
+    if (!state.localEngine && window.BolonhaLocalEngine) {
+      state.localEngine = window.BolonhaLocalEngine.createEngine();
+    }
+    atualizarBadgeMotor();
+    return state.localEngine.getState();
+  }
+
   async function init() {
     renderPlayerInputs();
     try {
-      const estado = await api("/api/estado");
-      state.game = estado;
+      if (deveForcarModoEstatico()) {
+        state.game = ativarModoEstatico();
+        render();
+        return;
+      }
+
+      const response = await fetch("api/estado");
+      if (response.ok) {
+        const data = await response.json();
+        if (data && typeof data.emAndamento === "boolean") {
+          state.mode = "java";
+          atualizarBadgeMotor();
+          state.game = data;
+          render();
+          return;
+        }
+      }
+      state.game = ativarModoEstatico();
       render();
     } catch (err) {
-      showToast("Não foi possível carregar o estado inicial: " + err.message, "erro");
+      if (window.BolonhaLocalEngine) {
+        state.game = ativarModoEstatico();
+        render();
+      } else {
+        showToast("Não foi possível carregar o estado inicial: " + err.message, "erro");
+      }
     }
   }
 

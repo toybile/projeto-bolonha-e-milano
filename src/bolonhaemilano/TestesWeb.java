@@ -113,7 +113,11 @@ public class TestesWeb {
 
         HttpResponse<String> js = get("/app.js");
         verificar("GET /app.js devolve HTTP 200",
-                js.statusCode() == 200 && contem(js.body(), "/api/estado"));
+                js.statusCode() == 200 && contem(js.body(), "api/estado"));
+
+        HttpResponse<String> localJs = get("/engine-local.js");
+        verificar("GET /engine-local.js devolve HTTP 200",
+                localJs.statusCode() == 200 && contem(localJs.body(), "BolonhaLocalEngine"));
 
         HttpResponse<String> inexistente = get("/nao-existe.txt");
         verificar("GET /nao-existe.txt devolve HTTP 404", inexistente.statusCode() == 404);

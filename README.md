@@ -17,6 +17,14 @@ Florins guardados não contam. Só se sobe um título por ano.
 
 Projeto do 4º bimestre de Teoria e Desenvolvimento de Sistemas (SPOTDES), IFSP São Paulo.
 
+## Jogar online (GitHub Pages)
+
+A interface web funciona em **modo duplo**:
+- **Localmente com Java:** ao executar `bolonhaemilano.Main`, o navegador conversa com o servidor HTTP embutido (`ServidorWeb`), usando diretamente as classes Java do projeto.
+- **No GitHub Pages / Vercel (estático):** quando hospedada sem backend Java (ou aberta com `?mode=static`), a interface usa `web/engine-local.js`, com as mesmas regras e persistência automática em `localStorage`.
+
+Endereço no GitHub Pages: `https://toybile.github.io/projeto-bolonha-e-milano/`
+
 ## Como compilar e jogar
 
 É preciso ter o Java 17 (JDK). Na pasta raiz do repositório:
@@ -38,11 +46,13 @@ o navegador automaticamente. Opções disponíveis:
 ```bash
 java -cp bin bolonhaemilano.Testes
 java -cp bin bolonhaemilano.TestesWeb
+node tests/test-engine-local.js
 ```
 
 Saídas esperadas:
 - `Testes`: `Aprovados: 37 | Reprovados: 0` (regras de domínio)
 - `TestesWeb`: todos os testes da API HTTP/JSON e arquivos estáticos aprovados (`Reprovados: 0`)
+- `tests/test-engine-local.js`: todos os testes do motor estático JS aprovados (`Reprovados: 0`)
 
 ## Melhorias extras
 
@@ -95,7 +105,12 @@ src/bolonhaemilano/
 web/
   index.html         estrutura da interface visual
   styles.css         estilo pergaminho renascentista responsivo
-  app.js             controle da interface, pré-visualizações e panorama SVG dinâmico
+  engine-local.js    motor estático em JS (1:1 com as regras Java) para GitHub Pages/Vercel
+  app.js             controle da interface, detecção automática Java/estático e panorama SVG
+tests/
+  test-engine-local.js  testes automatizados de paridade do motor estático JS
+.github/workflows/
+  pages.yml          publicação automática da pasta web/ no GitHub Pages
 uml/
   diagrama-classes.puml / .png
   diagrama-sequencia-fim-do-ano.puml / .png
