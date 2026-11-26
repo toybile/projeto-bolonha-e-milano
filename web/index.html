@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bolonha e Milano — Crônicas Econômicas da Itália Medieval</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="parchment-backdrop" aria-hidden="true"></div>
+
+  <!-- TELA INICIAL / CONFIGURAÇÃO -->
+  <main id="setup-screen" class="setup-screen">
+    <div class="setup-shell">
+      <header class="setup-hero">
+        <div class="heraldic-medallion" aria-hidden="true">
+          <svg viewBox="0 0 80 80" width="68" height="68">
+            <circle cx="40" cy="40" r="37" fill="#241a12" stroke="#d4a843" stroke-width="2.5"/>
+            <circle cx="40" cy="40" r="31" fill="none" stroke="#8f2424" stroke-width="1.5"/>
+            <path d="M40 14 L56 22 V42 C56 54 40 65 40 65 C40 65 24 54 24 42 V22 Z" fill="#8f2424" stroke="#d4a843" stroke-width="2"/>
+            <path d="M40 14 V65 M24 36 H56" stroke="#f4ecdc" stroke-width="2.5" opacity="0.9"/>
+            <path d="M31 20 L35 12 L40 18 L45 12 L49 20 Z" fill="#d4a843"/>
+          </svg>
+        </div>
+        <p class="eyebrow">Itália Medieval · 1400 – 1410</p>
+        <h1 class="brand-title">Bolonha e Milano</h1>
+        <p class="brand-subtitle">
+          Governe uma cidade-Estado italiana, equilibre colheitas, tributos, obras e defesa,
+          e conquiste o título de <strong>Rei/Rainha</strong> antes do fim da década.
+        </p>
+      </header>
+
+      <div class="setup-grid">
+        <section class="parchment-card setup-card">
+          <div class="card-header-line">
+            <h2>Conselho de Governantes</h2>
+            <span class="pill pill-gold">1 a 4 jogadores</span>
+          </div>
+
+          <div class="player-count-row" role="group" aria-label="Quantidade de jogadores">
+            <span class="field-label">Número de Cidades-Estado</span>
+            <div class="segmented-control" id="player-count-control">
+              <button type="button" class="seg-btn" data-count="1">1 Jogador</button>
+              <button type="button" class="seg-btn active" data-count="2">2 Jogadores</button>
+              <button type="button" class="seg-btn" data-count="3">3 Jogadores</button>
+              <button type="button" class="seg-btn" data-count="4">4 Jogadores</button>
+            </div>
+          </div>
+
+          <form id="new-game-form" class="player-inputs-list">
+            <div id="player-fields-container" class="player-fields-container"></div>
+
+            <div class="setup-actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="btn-start-game">
+                Iniciar Crônica de 1400
+              </button>
+              <button type="button" class="btn btn-ghost" id="btn-open-about-setup">
+                Sobre as Regras
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="parchment-card rules-preview-card">
+          <div class="card-header-line">
+            <h2>Escada da Nobreza</h2>
+            <span class="pill pill-ink">Prestígio</span>
+          </div>
+          <ol class="title-ladder-mini">
+            <li><span>Cavaleiro</span><strong>0</strong></li>
+            <li><span>Barão</span><strong>400</strong></li>
+            <li><span>Conde</span><strong>550</strong></li>
+            <li><span>Marquês</span><strong>700</strong></li>
+            <li><span>Duque</span><strong>850</strong></li>
+            <li class="monarch"><span>Rei / Rainha</span><strong>1.000</strong></li>
+          </ol>
+
+          <div class="formula-box">
+            <span class="formula-label">Fórmula do Prestígio</span>
+            <code>construções × 10 + soldados × 2 + servos + terras ÷ 100</code>
+            <p class="formula-note">
+              Florins guardados no tesouro <strong>não contam</strong> para o prestígio — é preciso investir.
+              Cada governante sobe no máximo <strong>um título por ano</strong>.
+            </p>
+          </div>
+
+          <div class="starting-stats-summary">
+            <span><strong>Início padrão (1400):</strong></span>
+            <span>1.000 florins · 10.000 ha · 500 grãos · 200 servos · 10% imposto · Justiça Moderada (300 prestígio)</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- PAINEL PRINCIPAL DO JOGO -->
+  <div id="game-screen" class="game-screen hidden">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-brand">
+          <span class="mini-crest" id="header-crest" aria-hidden="true"></span>
+          <div>
+            <h1 class="topbar-title">Bolonha e Milano</h1>
+            <p class="topbar-subtitle" id="topbar-turn-label">Ano 1400 · Vez de ...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-center">
+        <div class="year-track" aria-label="Progresso da década">
+          <div class="year-track-labels">
+            <span>1400</span>
+            <strong id="year-badge">Ano 1400 / 1410</strong>
+            <span>1410</span>
+          </div>
+          <div class="year-progress-bar">
+            <div class="year-progress-fill" id="year-progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-open-about-game">Regras</button>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-new-game-top">Nova Partida</button>
+        <button type="button" class="btn btn-primary" id="btn-end-turn">
+          Encerrar Turno
+        </button>
+      </div>
+    </header>
+
+    <div class="dashboard-layout">
+      <section class="main-column">
+        <!-- PANORAMA + ESCADA DE PRESTÍGIO -->
+        <article class="parchment-card hero-city-card" id="hero-city-card">
+          <div class="hero-city-top">
+            <div class="city-identity">
+              <div class="city-shield" id="active-city-shield" aria-hidden="true"></div>
+              <div>
+                <div class="city-name-row">
+                  <h2 id="active-city-name">Bolonha</h2>
+                  <span class="pill pill-title" id="active-player-title">Cavaleiro</span>
+                </div>
+                <p class="ruler-subtitle">
+                  Governada por <strong id="active-player-name">Jogador 1</strong>
+                  · <span id="active-government-summary">Imposto 10% · Justiça Moderada</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="annual-checklist">
+              <span class="status-chip" id="chip-colheita">Colheita: Pendente</span>
+              <span class="status-chip" id="chip-impostos">Impostos: Pendentes</span>
+            </div>
+          </div>
+
+          <div class="panorama-wrapper">
+            <div id="city-panorama-svg" class="city-panorama-svg" aria-label="Panorama ilustrado da cidade-Estado"></div>
+          </div>
+
+          <div class="prestige-panel">
+            <div class="prestige-header">
+              <div>
+                <span class="prestige-label">Prestígio da Cidade</span>
+                <div class="prestige-value-row">
+                  <strong id="active-prestige-value">300</strong>
+                  <span id="active-next-title-hint">Próximo título: Barão (400)</span>
+                </div>
+              </div>
+              <div class="prestige-breakdown" id="prestige-breakdown">
+                <span>Obras: <strong>0</strong></span>
+                <span>Soldados: <strong>0</strong></span>
+                <span>Servos: <strong>200</strong></span>
+                <span>Terras: <strong>100</strong></span>
+              </div>
+            </div>
+
+            <div class="noble-stepper" id="noble-stepper" aria-label="Níveis de nobreza"></div>
+          </div>
+        </article>
+
+        <!-- 6 CARTÕES DE RECURSOS -->
+        <section class="kpi-grid" aria-label="Recursos da cidade">
+          <div class="kpi-card" data-kpi="florins">
+            <div class="kpi-icon kpi-gold" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5a2.5 2.5 0 0 1 5 0c0 1.5-5 1.5-5 3a2.5 2.5 0 0 0 5 0"/>
+              </svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Florins</span>
+              <div class="kpi-value-line">
+                <strong class="kpi-value" id="kpi-florins">1.000</strong>
+                <span class="kpi-delta" id="delta-florins"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card" data-kpi="terras">
+            <div class="kpi-icon kpi-olive" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 17c4-4 7-4 10 0s5 2 8-1M3 12c3-3 6-3 9 0s6 2 9-2"/><path d="M12 4v4"/>
+              </svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Terras (ha)</span>
+              <div class="kpi-value-line">
+                <strong class="kpi-value" id="kpi-terras">10.000</strong>
+                <span class="kpi-delta" id="delta-terras"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card" data-kpi="graos">
+            <div class="kpi-icon kpi-amber" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 21V5M12 9c-3 0-5-2-5-5 3 0 5 2 5 5Zm0 5c3 0 5-2 5-5-3 0-5 2-5 5Zm0 4c-3 0-5-2-5-5 3 0 5 2 5 5Z"/>
+              </svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Grãos</span>
+              <div class="kpi-value-line">
+                <strong class="kpi-value" id="kpi-graos">500</strong>
+                <span class="kpi-delta" id="delta-graos"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card" data-kpi="servos">
+            <div class="kpi-icon kpi-lapis" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="8" r="3"/><path d="M3 19a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 19a5 5 0 0 1 5-4"/>
+              </svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Servos</span>
+              <div class="kpi-value-line">
+                <strong class="kpi-value" id="kpi-servos">200</strong>
+                <span class="kpi-delta" id="delta-servos"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card" data-kpi="soldados">
+            <div class="kpi-icon kpi-crimson" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3Z"/>
+              </svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Soldados</span>
+              <div class="kpi-value-line">
+                <strong class="kpi-value" id="kpi-soldados">0</strong>
+                <span class="kpi-delta" id="delta-soldados"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card" data-kpi="construcoes">
+            <div class="kpi-icon kpi-ink" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 21V9l4-3 4 3v12M12 21V5l4-2 4 2v16M2 21h20M7 13h2M15 10h2M15 14h2"/>
+              </svg>
+            </div>
+            <div class="kpi-body">
+              <span class="kpi-label">Construções</span>
+              <div class="kpi-value-line">
+                <strong class="kpi-value" id="kpi-construcoes">0</strong>
+                <span class="kpi-delta" id="delta-construcoes"></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ABAS DE AÇÕES -->
+        <section class="parchment-card actions-card">
+          <div class="tabs-bar" role="tablist" aria-label="Conselhos da Cidade">
+            <button type="button" class="tab-btn active" data-tab="mercado" role="tab" aria-selected="true">
+              Mercado
+            </button>
+            <button type="button" class="tab-btn" data-tab="agricultura" role="tab" aria-selected="false">
+              Agricultura
+            </button>
+            <button type="button" class="tab-btn" data-tab="governo" role="tab" aria-selected="false">
+              Governo
+            </button>
+            <button type="button" class="tab-btn" data-tab="construcoes" role="tab" aria-selected="false">
+              Construções &amp; Defesa
+            </button>
+          </div>
+
+          <!-- ABA MERCADO -->
+          <div class="tab-panel active" id="tab-mercado" role="tabpanel">
+            <div class="panel-split">
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Comércio de Grãos</h3>
+                  <span class="rate-badge">2 florins / grão</span>
+                </div>
+                <p class="action-desc">Compre sementes antes da colheita ou venda o excedente da safra.</p>
+
+                <div class="qty-control-row">
+                  <label for="input-graos-qtd">Quantidade de grãos</label>
+                  <div class="qty-input-group">
+                    <input type="number" id="input-graos-qtd" min="1" step="1" value="100">
+                    <button type="button" class="btn-chip" data-set-input="input-graos-qtd" data-val="50">50</button>
+                    <button type="button" class="btn-chip" data-set-input="input-graos-qtd" data-val="250">250</button>
+                    <button type="button" class="btn-chip" id="btn-max-comprar-graos">Máx. compra</button>
+                    <button type="button" class="btn-chip" id="btn-max-vender-graos">Tudo</button>
+                  </div>
+                </div>
+
+                <div class="live-preview" id="preview-mercado-graos"></div>
+
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-primary" id="btn-comprar-graos">Comprar Grãos</button>
+                  <button type="button" class="btn btn-secondary" id="btn-vender-graos">Vender Grãos</button>
+                </div>
+              </div>
+
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Comércio de Terras</h3>
+                  <span class="rate-badge">1 florim / hectare</span>
+                </div>
+                <p class="action-desc">Cada 100 hectares rendem +1 ponto de prestígio e ampliam a área cultivável.</p>
+
+                <div class="qty-control-row">
+                  <label for="input-terras-qtd">Quantidade de hectares</label>
+                  <div class="qty-input-group">
+                    <input type="number" id="input-terras-qtd" min="1" step="1" value="500">
+                    <button type="button" class="btn-chip" data-set-input="input-terras-qtd" data-val="100">100</button>
+                    <button type="button" class="btn-chip" data-set-input="input-terras-qtd" data-val="500">500</button>
+                    <button type="button" class="btn-chip" id="btn-max-comprar-terras">Máx. compra</button>
+                    <button type="button" class="btn-chip" id="btn-max-vender-terras">Tudo</button>
+                  </div>
+                </div>
+
+                <div class="live-preview" id="preview-mercado-terras"></div>
+
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-primary" id="btn-comprar-terras">Comprar Terras</button>
+                  <button type="button" class="btn btn-secondary" id="btn-vender-terras">Vender Terras</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABA AGRICULTURA -->
+          <div class="tab-panel" id="tab-agricultura" role="tabpanel">
+            <div class="panel-split">
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Colheita Anual</h3>
+                  <span class="rate-badge">1 vez por ano</span>
+                </div>
+                <p class="action-desc">
+                  Cada servo cultiva até 5 ha. Gasta 0,5 grão por hectare em sementes e produz 2 grãos/ha.
+                </p>
+
+                <div class="live-preview" id="preview-colheita"></div>
+
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-primary" id="btn-colher">Colher Safra do Ano</button>
+                </div>
+              </div>
+
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Distribuir Alimentos</h3>
+                  <span class="rate-badge" id="badge-pct-alimentos">40% dos grãos</span>
+                </div>
+                <p class="action-desc">
+                  1 grão alimenta 5 servos. Se houver comida suficiente, os servos crescem +5%; se faltar, há perdas.
+                </p>
+
+                <div class="slider-row">
+                  <div class="slider-header">
+                    <label for="slider-alimentos">Percentual do estoque (20% a 80%)</label>
+                    <strong id="val-slider-alimentos">40%</strong>
+                  </div>
+                  <input type="range" id="slider-alimentos" min="20" max="80" step="1" value="40">
+                </div>
+
+                <div class="live-preview" id="preview-alimentos"></div>
+
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-primary" id="btn-distribuir">Distribuir Alimentos</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABA GOVERNO -->
+          <div class="tab-panel" id="tab-governo" role="tabpanel">
+            <div class="panel-split">
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Tesouro e Impostos</h3>
+                  <span class="rate-badge">1 vez por ano</span>
+                </div>
+                <p class="action-desc">
+                  Receita = <code>servos × taxa ÷ 100 × multiplicador de justiça</code> (arredondado para baixo).
+                </p>
+
+                <div class="live-preview" id="preview-impostos"></div>
+
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-primary" id="btn-arrecadar">Arrecadar Impostos</button>
+                </div>
+
+                <hr class="soft-divider">
+
+                <div class="slider-row">
+                  <div class="slider-header">
+                    <label for="slider-taxa">Taxa de Imposto (0% a 50%)</label>
+                    <strong id="val-slider-taxa">10%</strong>
+                  </div>
+                  <input type="range" id="slider-taxa" min="0" max="50" step="1" value="10">
+                </div>
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-secondary" id="btn-definir-taxa">Aplicar Taxa de Imposto</button>
+                </div>
+              </div>
+
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Nível de Justiça</h3>
+                  <span class="rate-badge" id="badge-justica-atual">Moderada</span>
+                </div>
+                <p class="action-desc">
+                  Define o multiplicador aplicado sobre os impostos arrecadados na cidade.
+                </p>
+
+                <div class="justice-cards" id="justice-cards">
+                  <button type="button" class="justice-card" data-nivel="Justa">
+                    <div class="justice-title">Justa</div>
+                    <div class="justice-mult">× 0,8</div>
+                    <div class="justice-sub">Tributação branda sobre o povo</div>
+                  </button>
+                  <button type="button" class="justice-card" data-nivel="Moderada">
+                    <div class="justice-title">Moderada</div>
+                    <div class="justice-mult">× 1,0</div>
+                    <div class="justice-sub">Equilíbrio tradicional da corte</div>
+                  </button>
+                  <button type="button" class="justice-card" data-nivel="Severa">
+                    <div class="justice-title">Severa</div>
+                    <div class="justice-mult">× 1,3</div>
+                    <div class="justice-sub">Cobrança rigorosa no tesouro</div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABA CONSTRUÇÕES -->
+          <div class="tab-panel" id="tab-construcoes" role="tabpanel">
+            <div class="panel-split">
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Recrutar Soldados</h3>
+                  <span class="rate-badge">5 florins + 1 servo</span>
+                </div>
+                <p class="action-desc">
+                  Cada soldado vale +2 de prestígio (consome 1 servo de +1, saldo líquido +1 de prestígio).
+                </p>
+
+                <div class="qty-control-row">
+                  <label for="input-soldados-qtd">Quantidade de soldados</label>
+                  <div class="qty-input-group">
+                    <input type="number" id="input-soldados-qtd" min="1" step="1" value="10">
+                    <button type="button" class="btn-chip" data-set-input="input-soldados-qtd" data-val="5">5</button>
+                    <button type="button" class="btn-chip" data-set-input="input-soldados-qtd" data-val="20">20</button>
+                    <button type="button" class="btn-chip" id="btn-max-recrutar">Máximo</button>
+                  </div>
+                </div>
+
+                <div class="live-preview" id="preview-soldados"></div>
+
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-primary" id="btn-recrutar">Recrutar Soldados</button>
+                </div>
+              </div>
+
+              <div class="action-box">
+                <div class="action-box-header">
+                  <h3>Construir Obras</h3>
+                  <span class="rate-badge">20 florins / obra</span>
+                </div>
+                <p class="action-desc">
+                  Principal fonte de prestígio da cidade: cada construção erguida soma +10 de prestígio.
+                </p>
+
+                <div class="qty-control-row">
+                  <label for="input-construcoes-qtd">Quantidade de obras</label>
+                  <div class="qty-input-group">
+                    <input type="number" id="input-construcoes-qtd" min="1" step="1" value="5">
+                    <button type="button" class="btn-chip" data-set-input="input-construcoes-qtd" data-val="1">1</button>
+                    <button type="button" class="btn-chip" data-set-input="input-construcoes-qtd" data-val="10">10</button>
+                    <button type="button" class="btn-chip" id="btn-max-construir">Máximo</button>
+                  </div>
+                </div>
+
+                <div class="live-preview" id="preview-construcoes"></div>
+
+                <div class="action-btn-row">
+                  <button type="button" class="btn btn-primary" id="btn-construir">Construir Obras</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- BARRA LATERAL: CLASSIFICAÇÃO & CRÔNICA -->
+      <aside class="side-column">
+        <section class="parchment-card standings-card">
+          <div class="card-header-line">
+            <h3>Classificação</h3>
+            <span class="pill pill-ink" id="standings-count">2 cidades</span>
+          </div>
+          <div id="standings-list" class="standings-list"></div>
+        </section>
+
+        <section class="parchment-card chronicle-card">
+          <div class="card-header-line">
+            <h3>Crônica da Partida</h3>
+            <span class="pill pill-gold">Registros</span>
+          </div>
+          <ul id="chronicle-list" class="chronicle-list"></ul>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <!-- TOAST DE FEEDBACK -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- MODAL: FIM DE ANO -->
+  <div id="modal-year-end" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="year-end-title">
+    <div class="modal-card parchment-card">
+      <div class="modal-seal">Anno Domini</div>
+      <h2 id="year-end-title">Fim do Ano 1400</h2>
+      <p id="year-end-subtitle" class="modal-subtitle"></p>
+      <div id="year-end-promotions" class="promotions-box"></div>
+      <div id="year-end-standings" class="modal-standings"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary btn-lg" id="btn-close-year-end">Avançar para o Novo Ano</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VITÓRIA / FIM DE JOGO -->
+  <div id="modal-victory" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="victory-title">
+    <div class="modal-card parchment-card victory-card">
+      <div class="modal-seal crown-seal">Coroação Final</div>
+      <h2 id="victory-title">Fim de Jogo</h2>
+      <p id="victory-banner" class="victory-banner"></p>
+      <div id="victory-table" class="victory-table-wrap"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary btn-lg" id="btn-play-again">Iniciar Nova Partida</button>
+        <button type="button" class="btn btn-ghost" id="btn-close-victory">Inspecionar Tabuleiro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SOBRE O JOGO -->
+  <div id="modal-about" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="about-title">
+    <div class="modal-card parchment-card about-card">
+      <div class="card-header-line">
+        <h2 id="about-title">Sobre Bolonha e Milano</h2>
+        <button type="button" class="btn-icon-close" id="btn-close-about" aria-label="Fechar">✕</button>
+      </div>
+      <div class="about-content">
+        <p>
+          <strong>Bolonha e Milano</strong> é um jogo de estratégia econômica ambientado na Itália medieval (1400–1410),
+          para 1 a 4 jogadores em turnos alternados no mesmo computador.
+        </p>
+        <ul>
+          <li><strong>Objetivo:</strong> alcançar o título mais alto até o fim de <strong>1410</strong> ou vencer imediatamente quando alguém for promovido a <strong>Rei/Rainha</strong> (1.000 de prestígio). No empate de título, vence o maior prestígio.</li>
+          <li><strong>Prestígio:</strong> <code>construções × 10 + soldados × 2 + servos + terras ÷ 100</code>. Florins guardados não contam.</li>
+          <li><strong>Promoções:</strong> só é possível subir <strong>1 título por ano</strong>, no encerramento do ano (Cavaleiro → Barão 400 → Conde 550 → Marquês 700 → Duque 850 → Rei/Rainha 1000).</li>
+          <li><strong>Limites anuais:</strong> cada cidade pode <em>colher a safra</em> e <em>arrecadar impostos</em> apenas 1 vez por ano.</li>
+          <li><strong>Projeto original:</strong> 4º bimestre de SPOTDES (IFSP São Paulo), rodando diretamente sobre as classes Java originais.</li>
+        </ul>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-primary" id="btn-ok-about">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

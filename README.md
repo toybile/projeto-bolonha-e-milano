@@ -1,7 +1,8 @@
 # Bolonha e Milano
 
 Jogo de estratégia econômica na Itália medieval, de 1 a 4 jogadores no mesmo computador,
-jogado no terminal. Cada jogador governa uma cidade-Estado e tenta subir de título:
+com interface visual no navegador (e modo clássico no terminal). Cada jogador governa uma
+cidade-Estado e tenta subir de título:
 
 **Cavaleiro → Barão (400) → Conde (550) → Marquês (700) → Duque (850) → Rei/Rainha (1000)**
 
@@ -25,13 +26,23 @@ javac -encoding UTF-8 -d bin src/bolonhaemilano/*.java
 java -cp bin bolonhaemilano.Main
 ```
 
+Por padrão, o comando acima inicia a **interface visual** em `http://localhost:8080` e abre
+o navegador automaticamente. Opções disponíveis:
+
+- `--port <numero>` — define a porta HTTP (padrão `8080`)
+- `--no-browser` — inicia o servidor web sem abrir o navegador automaticamente
+- `--cli` ou `--terminal` — executa o jogo no modo clássico de terminal (`Menu`)
+
 ## Como rodar os testes
 
 ```bash
 java -cp bin bolonhaemilano.Testes
+java -cp bin bolonhaemilano.TestesWeb
 ```
 
-Saída esperada no final: `Aprovados: 37 | Reprovados: 0`.
+Saídas esperadas:
+- `Testes`: `Aprovados: 37 | Reprovados: 0` (regras de domínio)
+- `TestesWeb`: todos os testes da API HTTP/JSON e arquivos estáticos aprovados (`Reprovados: 0`)
 
 ## Melhorias extras
 
@@ -67,8 +78,9 @@ imposto de 10% e justiça Moderada (prestígio 300).
 
 ```
 src/bolonhaemilano/
-  Main.java          ponto de entrada: cria o Menu
-  Menu.java          laço principal; lê, chama as regras e mostra
+  Main.java          ponto de entrada: inicia a interface visual (ou Menu com --cli)
+  ServidorWeb.java   servidor HTTP embutido (JDK 17) e API JSON sobre as regras do jogo
+  Menu.java          laço do modo terminal; lê, chama as regras e mostra
   Partida.java       turnos, anos, fim de jogo e vencedor (1 a 4 cidades)
   Cidade.java        ano, recursos, governo, defesa e o que já foi feito no ano
   Jogador.java       nome e título de nobreza
@@ -77,8 +89,13 @@ src/bolonhaemilano/
   Governo.java       impostos e justiça
   Construcoes.java   soldados e obras
   Nobreza.java       prestígio e promoção de títulos
-  Testes.java        testes automáticos (main próprio, sem JUnit)
+  Testes.java        testes automáticos das regras de domínio (main próprio, sem JUnit)
+  TestesWeb.java     testes automáticos do servidor HTTP/JSON e rotas estáticas
   Cores.java         cores das mensagens no terminal (melhoria extra)
+web/
+  index.html         estrutura da interface visual
+  styles.css         estilo pergaminho renascentista responsivo
+  app.js             controle da interface, pré-visualizações e panorama SVG dinâmico
 uml/
   diagrama-classes.puml / .png
   diagrama-sequencia-fim-do-ano.puml / .png
